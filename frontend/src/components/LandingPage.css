@@ -1,51 +1,43 @@
+/* C:\VenuEase\frontend\src\components\LandingPage.css */
 .landing-page {
     min-height: 100vh;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: #FFFFFF;
+    font-family: 'Inter', sans-serif;
     color: #000000;
 }
 
-.container {
+/* Navigation - Match your design */
+.nav {
+    padding: 24px 0;
+    border-bottom: 1px solid #E5E5E5;
+}
+
+.nav-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 24px;
-}
-
-/* Header Styles */
-.landing-header {
-    background: #FFFFFF;
-    border-bottom: 1px solid #E5E5E5;
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 1000;
-}
-
-.landing-header .container {
+    padding: 0 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 24px;
 }
 
-.logo h1 {
-    color: #000000;
+.nav-brand .brand-text {
     font-size: 24px;
     font-weight: 700;
-    margin: 0;
+    color: #000000;
+    letter-spacing: -0.5px;
 }
 
-.navigation {
+.nav-links {
     display: flex;
-    gap: 32px;
-    align-items: center;
+    gap: 48px;
 }
 
 .nav-link {
     color: #000000;
     text-decoration: none;
-    font-weight: 500;
     font-size: 16px;
+    font-weight: 500;
     transition: color 0.2s ease;
 }
 
@@ -53,144 +45,131 @@
     color: #666666;
 }
 
-.login-btn, .signup-btn {
-    padding: 10px 24px;
+.nav-actions {
+    display: flex;
+    gap: 16px;
+}
+
+.nav-login, .nav-signup {
+    padding: 12px 24px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
+    font-size: 16px;
     font-weight: 600;
-    font-size: 14px;
     cursor: pointer;
     transition: all 0.2s ease;
     font-family: inherit;
 }
 
-.login-btn {
+.nav-login {
     background: transparent;
     color: #000000;
     border: 1px solid #000000;
 }
 
-.login-btn:hover {
+.nav-login:hover {
     background: #000000;
     color: #FFFFFF;
 }
 
-.signup-btn {
+.nav-signup {
     background: #000000;
     color: #FFFFFF;
 }
 
-.signup-btn:hover {
+.nav-signup:hover {
     background: #333333;
 }
 
-/* Features Section */
-.features-section {
-    padding: 140px 0 80px;
-    background: #FFFFFF;
-    margin-top: 80px;
-}
-
-.feature-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 48px;
+/* Hero Section - Match your design */
+.hero {
+    padding: 80px 0;
     text-align: center;
 }
 
-.feature-item h2 {
-    font-size: 24px;
+.hero-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+.hero-title {
+    font-size: 48px;
     font-weight: 700;
-    margin-bottom: 12px;
     color: #000000;
+    margin-bottom: 24px;
+    line-height: 1.2;
 }
 
-.feature-item p {
-    font-size: 16px;
+.hero-subtitle {
+    font-size: 18px;
     color: #666666;
-    line-height: 1.5;
-    margin: 0;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
-/* About Section */
-.about-section {
+/* About Section - Match your design */
+.about {
     padding: 80px 0;
     background: #F8F8F8;
+}
+
+.about-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 40px;
 }
 
 .about-title {
     font-size: 32px;
     font-weight: 700;
     text-align: center;
-    margin-bottom: 48px;
     color: #000000;
+    margin-bottom: 64px;
 }
 
-.venue-scheduling {
-    margin-bottom: 48px;
+.about-content {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+}
+
+.about-item {
     text-align: center;
 }
 
-.venue-scheduling:last-child {
-    margin-bottom: 0;
-}
-
-.venue-scheduling h3 {
-    font-size: 20px;
+.about-item-title {
+    font-size: 18px;
     font-weight: 700;
-    margin-bottom: 16px;
     color: #000000;
+    margin-bottom: 16px;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
 }
 
-.venue-scheduling p {
+.about-item-text {
     font-size: 16px;
     color: #666666;
     line-height: 1.6;
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-/* Footer */
-.landing-footer {
-    background: #000000;
-    color: #FFFFFF;
-    text-align: center;
-    padding: 24px 0;
-}
-
-.landing-footer p {
-    color: #FFFFFF;
-    font-size: 14px;
     margin: 0;
 }
 
-/* Responsive Design */
+/* Responsive */
 @media (max-width: 768px) {
-    .navigation {
-        gap: 20px;
+    .nav-container {
+        padding: 0 24px;
     }
     
-    .nav-link {
-        display: none;
+    .nav-links {
+        gap: 24px;
     }
     
-    .feature-grid {
-        grid-template-columns: 1fr;
-        gap: 32px;
+    .hero-title {
+        font-size: 36px;
     }
     
-    .features-section {
-        padding: 120px 0 60px;
-        margin-top: 60px;
-    }
-    
-    .about-section {
-        padding: 60px 0;
-    }
-    
-    .about-title {
-        font-size: 28px;
+    .hero-subtitle {
+        font-size: 16px;
     }
 }

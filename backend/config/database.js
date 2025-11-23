@@ -1,27 +1,28 @@
 const mysql = require('mysql2');
 
-// Create a connection pool instead of single connection
+// Create connection pool
 const pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
-    password: '1439', 
-    database: 'VenuEase'
+    password: '1439',
+    database: 'VenuEase',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
-// Test the connection
+// Test connection
 pool.getConnection((err, connection) => {
     if (err) {
-        console.error('❌ Database connection failed:');
-        console.error('Error:', err.message);
-        console.log('💡 Troubleshooting tips:');
-        console.log('1. Make sure MySQL is running in XAMPP/WAMP');
-        console.log('2. Check if database "VenuEase" exists');
-        console.log('3. Verify your MySQL username/password');
+        console.error('❌ DATABASE CONNECTION FAILED:', err.message);
+        console.log('💡 Make sure:');
+        console.log('   1. MySQL is running (XAMPP/WAMP)');
+        console.log('   2. Database "VenuEase" exists');
+        console.log('   3. MySQL username/password is correct');
         return;
     }
-    console.log('✅ Connected to MySQL database successfully!');
-    connection.release(); // Release the connection back to the pool
+    console.log('✅ DATABASE CONNECTED: VenuEase');
+    connection.release();
 });
 
-// Export the pool instead of connection
 module.exports = pool.promise();

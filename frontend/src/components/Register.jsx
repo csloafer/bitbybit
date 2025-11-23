@@ -1,12 +1,13 @@
+// C:\VenuEase\frontend\src\components\Register.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
 
 const Register = ({ switchToLogin, switchToLanding }) => {
     const [formData, setFormData] = useState({
-        full_Name: '',
+        username: '',
         email: '',
         password: '',
-        role: 'staff'
+        confirmPassword: ''
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -23,85 +24,127 @@ const Register = ({ switchToLogin, switchToLanding }) => {
         setLoading(true);
         setError('');
 
+        // Validation
+        if (formData.password !== formData.confirmPassword) {
+            setError('Passwords do not match');
+            setLoading(false);
+            return;
+        }
+
+        if (formData.password.length < 6) {
+            setError('Password must be at least 6 characters long');
+            setLoading(false);
+            return;
+        }
+
         try {
-            const response = await axios.post('http://localhost:5000/api/register', formData);
+            const userData = {
+                full_Name: formData.username,
+                email: formData.email,
+                password: formData.password
+                // Remove role: 'staff' - this is for customer registration
+            };
+
+            console.log('Sending registration data:', userData);
+
+            const response = await axios.post('http://localhost:5000/api/customer/register', userData);
+            
+            console.log('Registration response:', response.data);
+            
             alert('Registration successful! Please login.');
             switchToLogin();
         } catch (error) {
-            setError(error.response?.data?.error || 'Registration failed');
+            console.error('Registration error:', error);
+            setError(error.response?.data?.error || 'Registration failed. Please try again.');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="auth-container">
-            <div className="auth-header">
-                <button className="back-btn" onClick={switchToLanding}>← Back</button>
-                <div className="logo">VenuEase</div>
-            </div>
-            
-            <div className="auth-form-container">
-                <div className="auth-form">
-                    <h2>Create Account</h2>
-                    <p className="auth-subtitle">Join VenuEase today</p>
-                    
-                    {error && <div className="error-message">{error}</div>}
-                    
-                    <form onSubmit={handleSubmit}>
-                        <div className="form-group">
-                            <label>Full Name</label>
-                            <input
-                                type="text"
-                                name="full_Name"
-                                value={formData.full_Name}
-                                onChange={handleChange}
-                                placeholder="Enter your full name"
-                                required
-                            />
-                        </div>
+        <div className="auth-page">
+            <nav className="auth-nav">
+                <div className="auth-nav-container">
+                    <button className="back-btn" onClick={switchToLanding}>← Back</button>
+                    <div className="auth-brand">VenuEase</div>
+                    <div className="auth-nav-spacer"></div>
+                </div>
+            </nav>
+
+            <div className="auth-content">
+                <div className="auth-form-container">
+                    <div className="auth-form">
+                        <h2 className="auth-title">Sign Up</h2>
                         
-                        <div className="form-group">
-                            <label>Email Address</label>
-                            <input
-                                type="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                placeholder="Enter your email"
-                                required
-                            />
-                        </div>
+                        {error && <div className="auth-error">{error}</div>}
                         
-                        <div className="form-group">
-                            <label>Password</label>
-                            <input
-                                type="password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                placeholder="Create a password"
-                                required
-                            />
-                        </div>
+                        <form onSubmit={handleSubmit}>
+                            <div className="form-field">
+                                <label className="field-label">Full Name</label>
+                                <input
+                                    type="text"
+                                    name="username"
+                                    value={formData.username}
+                                    onChange={handleChange}
+                                    className="field-input"
+                                    placeholder="Enter your full name"
+                                    required
+                                />
+                            </div>
+                            
+                            <div className="form-field">
+                                <label className="field-label">Email</label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    className="field-input"
+                                    placeholder="Enter your email"
+                                    required
+                                />
+                            </div>
+                            
+                            <div className="form-field">
+                                <label className="field-label">Password</label>
+                                <input
+                                    type="password"
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    className="field-input"
+                                    placeholder="Create a password (min. 6 characters)"
+                                    required
+                                />
+                            </div>
+                            
+                            <div className="form-field">
+                                <label className="field-label">Confirm Password</label>
+                                <input
+                                    type="password"
+                                    name="confirmPassword"
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                    className="field-input"
+                                    placeholder="Confirm your password"
+                                    required
+                                />
+                            </div>
+                            
+                            <button 
+                                type="submit" 
+                                className="auth-submit-btn" 
+                                disabled={loading}
+                            >
+                                {loading ? 'Creating Account...' : 'SIGN UP'}
+                            </button>
+                        </form>
                         
-                        <div className="form-group">
-                            <label>Role</label>
-                            <select name="role" value={formData.role} onChange={handleChange}>
-                                <option value="staff">Staff Member</option>
-                                <option value="admin">Administrator</option>
-                            </select>
+                        <div className="auth-switch">
+                            <span>Already have an account? </span>
+                            <button onClick={switchToLogin} className="switch-link">Log-in</button>
                         </div>
-                        
-                        <button type="submit" className="auth-submit-btn" disabled={loading}>
-                            {loading ? 'Creating Account...' : 'Create Account'}
-                        </button>
-                    </form>
-                    
-                    <p className="auth-switch">
-                        Already have an account? 
-                        <span onClick={switchToLogin}> Sign in here</span>
-                    </p>
+                    </div>
                 </div>
             </div>
         </div>

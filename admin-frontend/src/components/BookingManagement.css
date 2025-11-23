@@ -1,0 +1,105 @@
+/* C:\VenuEase\admin-frontend\src\components\BookingManagement.css */
+.booking-management {
+    min-height: 100vh;
+    background: #f8f9fa;
+}
+
+.booking-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 24px;
+}
+
+.bookings-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.bookings-stats .stat-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+}
+
+.bookings-stats .stat-card h3 {
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.bookings-stats .stat-card p {
+    color: #111827;
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.bookings-list {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.bookings-list h3 {
+    color: #111827;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.bookings-list p {
+    color: #6b7280;
+    margin: 0;
+}
+
+/* Common admin header styles */
+.admin-header {
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0;
+}
+
+.admin-header .admin-header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+.btn-logout {
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.btn-logout:hover {
+    background: #b91c1c;
+}

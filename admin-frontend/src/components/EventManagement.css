@@ -1,0 +1,59 @@
+/* C:\VenuEase\admin-frontend\src\components\EventManagement.css */
+.event-management {
+    min-height: 100vh;
+    background: #f8f9fa;
+}
+
+.event-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 24px;
+}
+
+.events-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.events-stats .stat-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+}
+
+.events-stats .stat-card h3 {
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.events-stats .stat-card p {
+    color: #111827;
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.events-list {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.events-list h3 {
+    color: #111827;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.events-list p {
+    color: #6b7280;
+    margin: 0;
+}
