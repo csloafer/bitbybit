@@ -4,7 +4,7 @@ import './AdminLogin.css';
 
 const AdminLogin = ({ onLogin }) => {
     const [formData, setFormData] = useState({
-        email: '',
+        adminUser: '',
         password: ''
     });
     const [error, setError] = useState('');
@@ -23,7 +23,13 @@ const AdminLogin = ({ onLogin }) => {
         setError('');
 
         try {
-            const response = await axios.post('http://localhost:5000/api/admin/login', formData);
+            // Transform data to match your backend expectations
+            const loginData = {
+                email: formData.adminUser,
+                password: formData.password
+            };
+            
+            const response = await axios.post('http://localhost:5000/api/admin/login', loginData);
             onLogin(response.data.user);
         } catch (error) {
             setError(error.response?.data?.error || 'Admin login failed');
@@ -32,59 +38,69 @@ const AdminLogin = ({ onLogin }) => {
         }
     };
 
+    const goBack = () => {
+        window.history.back();
+    };
+
     return (
         <div className="admin-login-page">
-            <div className="admin-login-container">
-                <div className="admin-login-header">
-                    <div className="admin-logo">
-                        <span className="admin-icon">🔒</span>
-                        <h1>VenuEase Admin</h1>
-                    </div>
-                    <p className="admin-subtitle">System Administration Panel</p>
+            <div className="welcome-text center-text">WELCOME TO</div>
+            <div className="brand-name center-text">VENUEASE</div>
+            
+            <div className="container">
+                <div className="header">
+                    {/* Back Button */}
+                    <a href="#" className="back-button" onClick={(e) => { e.preventDefault(); goBack(); }}>
+                        ←
+                    </a>
                 </div>
 
-                <div className="admin-login-form">
-                    {error && <div className="admin-error">{error}</div>}
+                <div className="form-container">
+                    {error && <div className="admin-error center-text">{error}</div>}
                     
-                    <form onSubmit={handleSubmit}>
-                        <div className="form-group">
-                            <label>Admin Email</label>
-                            <input
-                                type="email"
-                                name="email"
-                                value={formData.email}
+                    <form id="adminLoginForm" onSubmit={handleSubmit}>
+                        <div className="input-group">
+                            <input 
+                                type="text" 
+                                id="admin-user"
+                                name="adminUser"
+                                value={formData.adminUser}
                                 onChange={handleChange}
-                                placeholder="admin@venuease.com"
-                                required
+                                placeholder="Admin User" 
+                                required 
+                                className="center-block"
                             />
                         </div>
-                        
-                        <div className="form-group">
-                            <label>Password</label>
-                            <input
-                                type="password"
+
+
+                        <div className="input-group">
+                            <input 
+                                type="password" 
+                                id="admin-password"
                                 name="password"
                                 value={formData.password}
                                 onChange={handleChange}
-                                placeholder="Enter admin password"
-                                required
+                                placeholder="Password" 
+                                required 
+                                className="center-block"
                             />
                         </div>
-                        
-                        <button type="submit" className="admin-login-btn" disabled={loading}>
-                            {loading ? 'Signing In...' : 'Access Admin Panel'}
+
+                        <button type="submit" className="btn center-block" disabled={loading}>
+                            {loading ? 'LOGGING IN...' : 'LOG-IN'}
                         </button>
                     </form>
 
-                    <div className="admin-login-note">
+                    <div className="help-section center-text">
+                        <div className="help-title">Something's wrong?</div>
+                        <a href="mailto:developer@venueease.com" className="help-link">Contact the developer</a>
+                    </div>
+
+                    <div className="admin-login-note center-text">
                         <h4>Default Admin Accounts:</h4>
                         <p>Email: <strong>admin@venuease.com</strong> | Password: <strong>admin123</strong></p>
                         <p>Email: <strong>staff@venuease.com</strong> | Password: <strong>staff123</strong></p>
                     </div>
-                </div>
-
-                <div className="admin-login-footer">
-                    <p>Customer website: <a href="http://localhost:3000" target="_blank">http://localhost:3000</a></p>
                 </div>
             </div>
         </div>

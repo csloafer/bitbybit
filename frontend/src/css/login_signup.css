@@ -1,0 +1,231 @@
+        .title {
+            width: 100%;
+            max-width: 700px;
+            background-color: white;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 0 auto;
+            position: relative;
+            max-height: 1000px;
+            height: 100%;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background-color: white;
+            border-radius: 25px;
+            overflow: hidden;
+            margin: 0 auto;
+            position: relative;
+            max-height: 1000px;
+            height: 100%;
+box-shadow: 0 25px 25px 0  rgba(0, 0, 0, 0.2);
+
+        }
+
+        .header {
+            padding: 10px 0;
+            text-align: center;
+            background-color: #eeebed;
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #bd9780;
+            font-size: 18px;
+            text-decoration: none;
+            font-weight: bolder;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-3px);
+        }
+
+        .welcome-text {
+            font-size: 24px;
+            font-weight: 300;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            color: #333;
+        }
+
+        .brand-name {
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #bd9780;
+        }
+
+        .form-container {
+            padding: 35px 30px;
+            text-align: center;
+            background-color: #eeebed;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+            text-align: center;
+        }
+
+        input {
+            width: 50%;
+            padding: 15px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background-color: #f8f9fa;
+            text-align: left;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        input:focus {
+            outline: none;
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(189, 151, 128, 0.3);
+        }
+
+        input::placeholder {
+            text-align: left;
+            color: #7f8c8d;
+        }
+
+        .btn {
+            width: 120px;
+            padding: 16px;
+            background: #bd9780;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 15px rgba(189, 151, 128, 0.4);
+            background: #a8826d;
+        }
+
+        .signup-link, .login-link, .help-section {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 15px;
+        }
+
+        .signup-link, .login-link, .help-section a {
+            color: #bd9780;
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 5px;
+            transition: color 0.2s;
+        }
+
+        .signup-link, .login-link, .help-section a:hover {
+            color: #a8826d;
+            text-decoration: underline;
+        }
+
+        /* Centering utilities */
+        .center-text {
+            text-align: center;
+            
+        }
+
+        .center-block {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                max-width: 100%;
+            }
+
+            .form-container {
+                padding: 25px 20px;
+            }
+
+            .header {
+                padding: 30px 20px;
+            }
+
+            .brand-name {
+                font-size: 36px;
+            }
+
+            .back-button {
+                top: 15px;
+                left: 15px;
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+            }
+
+            input {
+                width: 80%;
+            }
+        }
+
+        /* Animation for form elements */
+        .input-group {
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Stagger animation for input groups */
+        .input-group:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .input-group:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .btn {
+            animation-delay: 0.3s;
+        }
+
+        .signup-link {
+            animation-delay: 0.4s;
+        }

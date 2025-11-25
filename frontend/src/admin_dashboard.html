@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropSeasonProto</title>
+    <link rel="stylesheet" href="frontend/src/css/dashboard.css">
+    <link rel="stylesheet" href="fontawesome/css">
+
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="welcome-text">Welcome to VenueEase</div>
+            <div class="nav-tabs">
+                <button class="nav-tab active">Dashboard</button>
+                <button class="nav-tab">Users</button>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div></div> <!-- Spacer -->
+            <button class="logout-btn">Logout</button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <h1 class="section-title">Dashboard</h1>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">Total Active Users</div>
+                    <div class="stat-value">1,064</div>
+                    <div class="stat-subtitle">FOR A JOT TO USERS</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-title">Registered Venues</div>
+                    <div class="stat-value">106</div>
+                    <div class="stat-subtitle">REGISTERED (SUMES)</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-title">Avg. User Visit Time</div>
+                    <div class="stat-value">58</div>
+                    <div class="stat-subtitle">ANG. USER VISIT TIME (mins)</div>
+                </div>
+            </div>
+
+            <!-- Chart Section -->
+            <div class="chart-section">
+                <h2 class="chart-title">Monthly Active Users</h2>
+                <div class="chart-container">
+                    <div class="bar-chart">
+                        <div class="bar" style="height: 60%;">
+                            <span class="bar-value">1.2K</span>
+                            <span class="bar-label">Jan</span>
+                        </div>
+                        <div class="bar" style="height: 75%;">
+                            <span class="bar-value">1.5K</span>
+                            <span class="bar-label">Feb</span>
+                        </div>
+                        <div class="bar" style="height: 85%;">
+                            <span class="bar-value">1.7K</span>
+                            <span class="bar-label">Mar</span>
+                        </div>
+                        <div class="bar" style="height: 95%;">
+                            <span class="bar-value">1.9K</span>
+                            <span class="bar-label">Apr</span>
+                        </div>
+                        <div class="bar" style="height: 100%;">
+                            <span class="bar-value">2.0K</span>
+                            <span class="bar-label">May</span>
+                        </div>
+                        <div class="bar" style="height: 90%;">
+                            <span class="bar-value">1.8K</span>
+                            <span class="bar-label">Jun</span>
+                        </div>
+                        <div class="bar" style="height: 80%;">
+                            <span class="bar-value">1.6K</span>
+                            <span class="bar-label">Jul</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="scripts/admin_dashboard.js"></script>
+</body>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import LandingPage from './components/LandingPage';
-import Login from './components/Login';
+import Login from './components/login.jsx';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import './App.css';

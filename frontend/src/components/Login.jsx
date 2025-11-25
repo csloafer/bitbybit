@@ -1,10 +1,11 @@
 // C:\VenuEase\frontend\src\components\Login.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
+import login from'./login.css'; // We'll update this CSS file
 
 const Login = ({ switchToRegister, switchToLanding, onLogin }) => {
     const [formData, setFormData] = useState({
-        email: '',  // Backend expects email, not username
+        email: '',
         password: ''
     });
     const [error, setError] = useState('');
@@ -39,63 +40,65 @@ const Login = ({ switchToRegister, switchToLanding, onLogin }) => {
     };
 
     return (
-        <div className="auth-page">
-            <nav className="auth-nav">
-                <div className="auth-nav-container">
-                    <button className="back-btn" onClick={switchToLanding}>← Back</button>
-                    <div className="auth-brand">VenuEase</div>
-                    <div className="auth-nav-spacer"></div>
+        <div className="login-page">
+            <div className="container">
+                {/* Header Section */}
+                <div className="header">
+                    <button className="back-button" onClick={switchToLanding}>
+                        ←
+                    </button>
+                    <div className="welcome-text center-text">WELCOME TO</div>
+                    <div className="brand-name center-text">VENUEASE</div>
                 </div>
-            </nav>
 
-            <div className="auth-content">
-                <div className="auth-form-container">
-                    <div className="auth-form">
-                        <h2 className="auth-title">Log In</h2>
+                {/* Form Container */}
+                <div className="form-container">
+                    <form id="loginForm" onSubmit={handleSubmit}>
+                        {error && <div className="auth-error center-text">{error}</div>}
                         
-                        {error && <div className="auth-error">{error}</div>}
-                        
-                        <form onSubmit={handleSubmit}>
-                            <div className="form-field">
-                                <label className="field-label">Email Address</label>
-                                <input
-                                    type="email"
-                                    name="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    className="field-input"
-                                    placeholder="Enter your email"
-                                    required
-                                />
-                            </div>
-                            
-                            <div className="form-field">
-                                <label className="field-label">Password</label>
-                                <input
-                                    type="password"
-                                    name="password"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    className="field-input"
-                                    placeholder="Enter your password"
-                                    required
-                                />
-                            </div>
-                            
-                            <button 
-                                type="submit" 
-                                className="auth-submit-btn" 
-                                disabled={loading}
-                            >
-                                {loading ? 'Logging In...' : 'LOG IN'}
-                            </button>
-                        </form>
-                        
-                        <div className="auth-switch">
-                            <span>Don't have an account? </span>
-                            <button onClick={switchToRegister} className="switch-link">Sign-Up</button>
+                        <div className="input-group">
+                            <input 
+                                type="email" 
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                placeholder="Email" 
+                                required 
+                                className="center-block"
+                            />
                         </div>
-                    </div>
+
+                        <div className="input-group">
+                            <input 
+                                type="password" 
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                placeholder="Password" 
+                                required 
+                                className="center-block"
+                            />
+                        </div>
+
+                        <button 
+                            type="submit" 
+                            className="btn center-block" 
+                            disabled={loading}
+                        >
+                            {loading ? 'LOGGING IN...' : 'LOGIN'}
+                        </button>
+
+                        <div className="signup-link center-text">
+                            Don't have an account? <br />
+                            <button 
+                                type="button" 
+                                onClick={switchToRegister} 
+                                className="signup-link-btn"
+                            >
+                                Sign-up
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

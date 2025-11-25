@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropSeasonProto</title>
+    <link rel="stylesheet" href="frontend/src/css/login_signup.css">
+    <link rel="stylesheet" href="fontawesome/css">
+
+</head>
+
+<body>
+    <div>
+        <div class="welcome-text center-text">WELCOME TO</div>
+        <div class="brand-name center-text">VENUEASE</div>
+    </div>
+    <div class="container">
+
+        <div class="header">
+            <!-- Back Button -->
+            <a href="landing_page.html" class="back-button" onclick="goBack()">
+                ←
+            </a>
+
+
+        </div>
+
+        <div class="form-container">
+            <form id="loginForm">
+                <div class="input-group">
+                    <input type="text" id="username" placeholder="Username" required class="center-block">
+                </div>
+
+                <div class="input-group">
+                    <input type="password" id="password" placeholder="Password" required class="center-block">
+                </div>
+
+                <button type="submit" class="btn center-block">LOGIN</button>
+
+                <div class="signup-link center-text">
+                    Don't have an account? <br><a href="sign_up.html">Sign-up</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="scripts/login.js"></script>
+</body>

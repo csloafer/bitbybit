@@ -321,3 +321,60 @@ app.get('/api/admin/bookings', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
+
+
+// Add to server.js - Test database operations
+app.get('/api/debug/db-test', async (req, res) => {
+    try {
+        console.log('🧪 Testing database operations...');
+        
+        // Test 1: Basic query
+        const [test1] = await db.execute('SELECT 1 + 1 AS result');
+        console.log('✅ Basic query:', test1[0].result);
+        
+        // Test 2: Check CUSTOMERS table
+        const [tables] = await db.execute(`
+            SELECT TABLE_NAME 
+            FROM information_schema.TABLES 
+            WHERE TABLE_SCHEMA = 'VenuEase' AND TABLE_NAME = 'CUSTOMERS'
+        `);
+        console.log('✅ CUSTOMERS table exists:', tables.length > 0);
+        
+        // Test 3: Check table structure
+        const [columns] = await db.execute(`
+            SELECT COLUMN_NAME, DATA_TYPE, EXTRA
+            FROM information_schema.COLUMNS 
+            WHERE TABLE_SCHEMA = 'VenuEase' AND TABLE_NAME = 'CUSTOMERS'
+        `);
+        console.log('✅ CUSTOMERS columns:', columns);
+        
+        // Test 4: Try to insert a test record
+        const [insertTest] = await db.execute(
+            'INSERT INTO CUSTOMERS (full_Name, email, password_Hash) VALUES (?, ?, ?)',
+            ['Test User', 'test@test.com', 'temp_password']
+        );
+        console.log('✅ Insert test successful. ID:', insertTest.insertId);
+        
+        // Clean up
+        await db.execute('DELETE FROM CUSTOMERS WHERE email = ?', ['test@test.com']);
+        console.log('✅ Test record cleaned up');
+        
+        res.json({
+            status: 'SUCCESS',
+            tests: {
+                basic_query: 'PASS',
+                table_exists: 'PASS', 
+                table_structure: 'PASS',
+                insert_operation: 'PASS'
+            }
+        });
+        
+    } catch (error) {
+        console.error('❌ DB TEST FAILED:', error);
+        res.status(500).json({
+            status: 'FAILED',
+            error: error.message,
+            sqlMessage: error.sqlMessage
+        });
+    }
+});

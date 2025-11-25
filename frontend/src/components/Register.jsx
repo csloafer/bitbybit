@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const Register = ({ switchToLogin, switchToLanding }) => {
     const [formData, setFormData] = useState({
-        username: '',
+        full_Name: '',  // Changed from username
         email: '',
         password: '',
         confirmPassword: ''
@@ -39,23 +39,23 @@ const Register = ({ switchToLogin, switchToLanding }) => {
 
         try {
             const userData = {
-                full_Name: formData.username,
+                full_Name: formData.full_Name,
                 email: formData.email,
                 password: formData.password
-                // Remove role: 'staff' - this is for customer registration
             };
 
-            console.log('Sending registration data:', userData);
+            console.log('🔄 Sending registration:', userData);
 
             const response = await axios.post('http://localhost:5000/api/customer/register', userData);
             
-            console.log('Registration response:', response.data);
+            console.log('✅ Registration successful:', response.data);
             
             alert('Registration successful! Please login.');
             switchToLogin();
         } catch (error) {
-            console.error('Registration error:', error);
-            setError(error.response?.data?.error || 'Registration failed. Please try again.');
+            console.error('❌ Registration failed:', error);
+            const errorMessage = error.response?.data?.error || error.message || 'Registration failed';
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -83,8 +83,8 @@ const Register = ({ switchToLogin, switchToLanding }) => {
                                 <label className="field-label">Full Name</label>
                                 <input
                                     type="text"
-                                    name="username"
-                                    value={formData.username}
+                                    name="full_Name"  // Changed from username
+                                    value={formData.full_Name}
                                     onChange={handleChange}
                                     className="field-input"
                                     placeholder="Enter your full name"
