@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VenueEase</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Roboto, sans-serif;
+            background: white;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            border-bottom: 1px solid #bbb;
+            background: white;
+        }
+
+        .logo {
+            font-family: "Playfair Display", serif;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo span {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        /* NAVIGATION */
+        .top-nav {
+            display: flex;
+            gap: 30px;
+        }
+
+        .top-nav a {
+            text-decoration: none;
+            color: black;
+            font-size: 15px;
+        }
+
+        .top-nav a:hover {
+            text-decoration: underline;
+        }
+
+        /* PROFILE ICON */
+        .profile {
+            font-size: 35px;
+            cursor: pointer;
+        }
+
+        /* SUB NAV */
+        .sub-nav {
+            display: flex;
+            gap: 25px;
+            padding: 10px 40px;
+            border-bottom: 2px solid black;
+            background: white;
+        }
+
+        .sub-nav a {
+            text-decoration: none;
+            color: black;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .sub-nav a.active {
+            border-bottom: 2px solid black;
+            padding-bottom: 4px;
+        }
+
+        /* Tab content hidden by default */
+        .tab-content {
+            display: none;
+        }
+
+        /* HOME PAGE STYLES */
+        
+        /* HERO IMAGE */
+        .hero img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+        }
+
+        /* RECENT EVENTS */
+        .section-title {
+            margin: 25px 40px 10px 40px;
+            font-weight: bold;
+            padding: 6px 12px;
+            background: #c59b74;
+            color: white;
+            display: inline-block;
+            border-radius: 3px;
+        }
+
+        .events-container {
+            display: flex;
+            padding: 0 40px;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        .events-container img {
+            width: 240px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .event-text {
+            max-width: 60%;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .read-more {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .read-more:hover {
+            text-decoration: underline;
+        }
+
+        /* VENUES PAGE STYLES */
+        
+        /* TITLE */
+        h1 {
+            padding: 25px 40px 10px;
+            margin: 0;
+            font-family: "Playfair Display", serif;
+        }
+
+        /* VENUE CONTENT */
+        .venue-container {
+            display: flex;
+            gap: 30px;
+            padding: 0 40px;
+            margin-top: 15px;
+        }
+
+        .venue-container img {
+            width: 400px;
+            height: auto;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .description {
+            max-width: 60%;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        /* REVIEW SECTION */
+        .review-section {
+            padding: 30px 40px;
+        }
+
+        .review-title {
+            font-weight: bold;
+            padding: 6px 12px;
+            background: #c59b74;
+            color: white;
+            display: inline-block;
+            border-radius: 3px;
+            margin-bottom: 25px;
+        }
+
+        .review-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .review-card {
+            width: 250px;
+            background: #f0e1d8;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .review-card img {
+            width: 70px;
+        }
+
+        .stars {
+            margin-top: 10px;
+            font-size: 18px;
+            color: gold;
+        }
+
+        /* BUTTONS */
+        .buttons {
+            padding-left: 40px;
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+
+        .buttons button {
+            padding: 10px 20px;
+            margin-right: 15px;
+            background: #b27f5a;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .buttons button:hover {
+            opacity: 0.9;
+        }
+
+        /* OFFERS PAGE STYLES */
+        
+        /* SEARCH BAR */
+        .search-box {
+            margin: 20px 40px;
+            text-align: right;
+        }
+
+        .search-box input {
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 1px solid #ccc;
+            width: 250px;
+        }
+
+        /* OFFER CARDS */
+        .offers-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            padding: 0 40px 40px;
+        }
+
+        .offer-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            gap: 15px;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .offer-card img {
+            width: 230px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .offer-title {
+            font-weight: bold;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .book-btn {
+            margin-top: 15px;
+            padding: 8px 20px;
+            border: none;
+            background: #b27f5a;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .book-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* BOOKING PAGE STYLES */
+        .booking-container {
+            padding: 30px 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .venue-title {
+            font-family: "Playfair Display", serif;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .venue-details {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .venue-info {
+            margin-bottom: 20px;
+        }
+
+        .venue-price {
+            font-weight: bold;
+            color: #b27f5a;
+            font-size: 18px;
+            margin: 10px 0;
+        }
+
+        .booking-section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 18px;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .date-time-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .date-group, .time-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .date-input, .time-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-family: Roboto, sans-serif;
+        }
+
+        .booking-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .action-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .cancel-btn {
+            background: #ddd;
+            color: #333;
+        }
+
+        .continue-btn {
+            background: #b27f5a;
+            color: white;
+        }
+
+        .action-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* PAYMENT PAGE STYLES */
+        .payment-container {
+            padding: 30px 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .payment-title {
+            font-family: "Playfair Display", serif;
+            font-size: 28px;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #c59b74;
+        }
+
+        .payment-methods {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .payment-method {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .method-title {
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .qr-container {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            background: #e0e0e0;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .connect-bank {
+            display: block;
+            margin-top: 15px;
+            color: #b27f5a;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .connect-bank:hover {
+            text-decoration: underline;
+        }
+
+        .wallet-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .wallet-option:hover {
+            background: #f0f0f0;
+        }
+
+        .wallet-option.selected {
+            background: #f0e1d8;
+            border: 1px solid #c59b74;
+        }
+
+        .wallet-icon {
+            width: 40px;
+            height: 40px;
+            background: #e0e0e0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .wallet-details {
+            flex: 1;
+        }
+
+        .wallet-name {
+            font-weight: bold;
+        }
+
+        .wallet-number {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .payment-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        .payment-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .back-btn {
+            background: #ddd;
+            color: #333;
+        }
+
+        .pay-btn {
+            background: #b27f5a;
+            color: white;
+        }
+
+        .payment-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* SUCCESS MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .success-icon {
+            font-size: 60px;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-family: "Playfair Display", serif;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .amount-details {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .amount-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+
+        .modal-btn {
+            padding: 10px 25px;
+            background: #b27f5a;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .modal-btn:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+            <span>Venu</span>Ease
+        </div>
+
+        <nav class="top-nav">
+            <a href="#">Schedules</a>
+            <a href="#">Places</a>
+            <a href="#">Offers</a>
+        </nav>
+
+        <div class="profile">👤</div>
+    </header>
+
+    <!-- SUB NAVIGATION -->
+    <div class="sub-nav">
+        <a href="#" class="active" onclick="openTab('home', this)">Home</a>
+        <a href="#" onclick="openTab('offers', this)">Offers</a>
+        <a href="#" onclick="openTab('venues', this)">Venues</a>
+    </div>
+
+    <!-- HOME TAB -->
+    <section id="home" class="tab-content" style="display:block;">
+
+        <!-- HERO IMAGE -->
+        <section class="hero">
+            <img src="picture/QCU_thumbnail.jpg" alt="Event Image">
+        </section>
+
+        <!-- RECENT EVENTS -->
+        <div class="section-title">Recent Events</div>
+
+        <section class="events-container">
+            <img src="picture/unnamed (1).png" alt="Event Photo">
+
+            <div class="event-text">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt 
+                ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris 
+                nisi ut aliquip ex ea commodo consequat.
+                <br><br>
+                Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla 
+                pariatur. Excepteur sint occaecat cupidatat non proident.
+                
+                <div class="read-more">Read More ></div>
+            </div>
+        </section>
+
+    </section>
+
+    <!-- OFFERS TAB -->
+    <section id="offers" class="tab-content">
+        <h1 style="padding: 25px 40px 10px; margin: 0; font-family: 'Playfair Display', serif;">Offers</h1>
+        
+        <div class="search-box">
+            <input type="text" placeholder="Search...">
+        </div>
+
+        <section class="offers-container">
+
+            <!-- Offer Card -->
+            <div class="offer-card">
+                <img src="picture/venue1.jpg">
+                <div>
+                    <div class="offer-title">THE REVEREND</div>
+                    <p>
+                        Address: Bago Bantay, Quezon City<br><br>
+                        Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                    </p>
+                    <button class="book-btn" onclick="startBooking('THE REVEREND', 'Bago Bantay, Quezon City', 666)">BOOK NOW</button>
+                </div>
+            </div>
+
+            <!-- Repeat 3 More Cards -->
+            <div class="offer-card">
+                <img src="picture/venue1.jpg">
+                <div>
+                    <div class="offer-title">VENUE TWO</div>
+                    <p>
+                        Address: Somewhere, Quezon City<br><br>
+                        Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    </p>
+                    <button class="book-btn" onclick="startBooking('VENUE TWO', 'Somewhere, Quezon City', 850)">BOOK NOW</button>
+                </div>
+            </div>
+
+            <div class="offer-card">
+                <img src="picture/venue1.jpg">
+                <div>
+                    <div class="offer-title">VENUE THREE</div>
+                    <p>
+                        Address: Another Place, Quezon City<br><br>
+                        Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    </p>
+                    <button class="book-btn" onclick="startBooking('VENUE THREE', 'Another Place, Quezon City', 720)">BOOK NOW</button>
+                </div>
+            </div>
+
+            <div class="offer-card">
+                <img src="picture/venue1.jpg">
+                <div>
+                    <div class="offer-title">VENUE FOUR</div>
+                    <p>
+                        Address: Different Location, Quezon City<br><br>
+                        Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    </p>
+                    <button class="book-btn" onclick="startBooking('VENUE FOUR', 'Different Location, Quezon City', 950)">BOOK NOW</button>
+                </div>
+            </div>
+
+        </section>
+    </section>
+
+    <!-- VENUES TAB -->
+    <section id="venues" class="tab-content">
+        <!-- PAGE TITLE -->
+        <h1>THE REVEREND</h1>
+
+        <!-- VENUE SECTION -->
+        <div class="venue-container">
+            <img src="picture/venue1.jpg">
+
+            <div class="description">
+                <p><b>Address:</b> Nobdustrial Road, Bago Bantay, Quezon City</p>
+
+                <h3>Description:</h3>
+
+                <p>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Praesentium saepe consequatur impedit laudantium nesciunt exercitationem
+                    ullam fuga recusandae aperiam...
+                </p>
+            </div>
+        </div>
+
+        <!-- REVIEWS -->
+        <div class="review-section">
+            <div class="review-title">REVIEWS</div>
+
+            <div class="review-row">
+
+                <div class="review-card">
+                    <img src="picture/review1.png">
+                    <p>Excellent service and venue!</p>
+                    <div class="stars">★★★★★</div>
+                </div>
+
+                <div class="review-card">
+                    <img src="picture/review2.png">
+                    <p>Exceeded expectations!</p>
+                    <div class="stars">★★★★★</div>
+                </div>
+
+                <div class="review-card">
+                    <img src="picture/review3.png">
+                    <p>Beautiful and well-maintained place.</p>
+                    <div class="stars">★★★★★</div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- BUTTONS -->
+        <div class="buttons">
+            <button>Add a Review</button>
+            <button onclick="startBooking('THE REVEREND', 'Nobdustrial Road, Bago Bantay, Quezon City', 666)">Book Now</button>
+        </div>
+    </section>
+
+    <!-- BOOKING PAGE (Hidden by default) -->
+    <section id="booking" class="tab-content">
+        <div class="booking-container">
+            <h1 class="venue-title" id="bookingVenueTitle">THE REVEREND</h1>
+            
+            <div class="venue-details">
+                <div class="venue-info">
+                    <p><strong>Address:</strong> <span id="bookingVenueAddress">Street, Block, Barangay, City</span></p>
+                    <div class="venue-price">PRICE: ₱<span id="bookingVenuePrice">666</span></div>
+                </div>
+                
+                <div class="section-title">DESCRIPTION</div>
+                <p>INCIDIDUNT UT LABORE ET DOLORE MAGNA ALIQUA. UT ENIM AD MINIM VENIAM, QUIS NOSTRUD EXERCITATION ULLAMCO LABORIS NISI UT ALIQUIP EX EA COMMODO CONSEQUAT. DUIS AUTE IRURE DOLORE IN REPREHENDERIT IN VOLUPTATE VELIT ESSE CILLUM DOLORE EU FUGIAT NULLA PARIAYUR. EXCEPTEUR SINT OCCAECAT</p>
+            </div>
+            
+            <div class="booking-section">
+                <div class="section-title">DATE & TIME</div>
+                
+                <div class="date-time-container">
+                    <div class="date-group">
+                        <label>From Date:</label>
+                        <input type="date" class="date-input" id="fromDate">
+                        
+                        <label>To Date:</label>
+                        <input type="date" class="date-input" id="toDate">
+                    </div>
+                    
+                    <div class="time-group">
+                        <label>From Time:</label>
+                        <input type="time" class="time-input" id="fromTime">
+                        
+                        <label>To Time:</label>
+                        <input type="time" class="time-input" id="toTime">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="booking-actions">
+                <button class="action-btn cancel-btn" onclick="cancelBooking()">CANCEL</button>
+                <button class="action-btn continue-btn" onclick="proceedToPayment()">CONTINUE TO PAYMENT</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- PAYMENT PAGE (Hidden by default) -->
+    <section id="payment" class="tab-content">
+        <div class="payment-container">
+            <h1 class="payment-title">PAYMENT METHOD</h1>
+            
+            <div class="payment-methods">
+                <div class="payment-method">
+                    <div class="method-title">ONLINE BANKING</div>
+                    
+                    <div class="qr-container">
+                        <p>SCAN THIS QR CODE</p>
+                        <p>WHEN USING E-WALLET</p>
+                        <div class="qr-code">
+                            [QR CODE PLACEHOLDER]
+                        </div>
+                        <a href="#" class="connect-bank">Connect your bank now ></a>
+                    </div>
+                </div>
+                
+                <div class="payment-method">
+                    <div class="method-title">ONLINE WALLETS</div>
+                    
+                    <div class="wallet-option" onclick="selectWallet(this)">
+                        <div class="wallet-icon">GC</div>
+                        <div class="wallet-details">
+                            <div class="wallet-name">GCash</div>
+                            <div class="wallet-number">+63 000 000 0000</div>
+                        </div>
+                    </div>
+                    
+                    <div class="wallet-option" onclick="selectWallet(this)">
+                        <div class="wallet-icon">PP</div>
+                        <div class="wallet-details">
+                            <div class="wallet-name">PayPal</div>
+                            <div class="wallet-number">user@example.com</div>
+                        </div>
+                    </div>
+                    
+                    <div class="wallet-option" onclick="selectWallet(this)">
+                        <div class="wallet-icon">MP</div>
+                        <div class="wallet-details">
+                            <div class="wallet-name">Maya</div>
+                            <div class="wallet-number">+63 000 000 0000</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="payment-actions">
+                <button class="payment-btn back-btn" onclick="backToBooking()">BACK</button>
+                <button class="payment-btn pay-btn" onclick="processPayment()">PROCEED TO PAYMENT</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- SUCCESS MODAL -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="success-icon">✓</div>
+            <h2 class="modal-title">PAYMENT SUCCESSFUL!</h2>
+            
+            <div class="amount-details">
+                <div class="amount-row">
+                    <span>Amount Paid:</span>
+                    <span id="paidAmount">₱666.00</span>
+                </div>
+                <div class="amount-row">
+                    <span>Total Amount Sent:</span>
+                    <span id="totalAmount">₱666.00</span>
+                </div>
+            </div>
+            
+            <p>Your payment has been processed successfully. You will receive a confirmation email shortly.</p>
+            
+            <button class="modal-btn" onclick="closeModal()">OK</button>
+        </div>
+    </div>
+
+    <!-- TAB SWITCH SCRIPT -->
+    <script>
+        let currentVenue = {
+            title: '',
+            address: '',
+            price: 0
+        };
+
+        function openTab(tabName, element) {
+            // Hide all tab content
+            document.querySelectorAll(".tab-content").forEach(section => {
+                section.style.display = "none";
+            });
+
+            // Remove active state from all tab buttons
+            document.querySelectorAll(".sub-nav a").forEach(link => {
+                link.classList.remove("active");
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).style.display = "block";
+
+            // Set active state to the clicked tab button
+            if (element) {
+                element.classList.add("active");
+            }
+        }
+
+        function startBooking(title, address, price) {
+            currentVenue = {
+                title: title,
+                address: address,
+                price: price
+            };
+            
+            // Update booking page with venue details
+            document.getElementById('bookingVenueTitle').textContent = title;
+            document.getElementById('bookingVenueAddress').textContent = address;
+            document.getElementById('bookingVenuePrice').textContent = price;
+            
+            // Update payment amounts
+            document.getElementById('paidAmount').textContent = `₱${price}.00`;
+            document.getElementById('totalAmount').textContent = `₱${price}.00`;
+            
+            // Show booking page
+            openTab('booking');
+        }
+
+        function cancelBooking() {
+            if(confirm("Are you sure you want to cancel this booking?")) {
+                // Reset form
+                document.getElementById('fromDate').value = '';
+                document.getElementById('toDate').value = '';
+                document.getElementById('fromTime').value = '';
+                document.getElementById('toTime').value = '';
+                
+                // Go back to offers
+                openTab('offers');
+            }
+        }
+
+        function proceedToPayment() {
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+            const fromTime = document.getElementById('fromTime').value;
+            const toTime = document.getElementById('toTime').value;
+            
+            if (!fromDate || !toDate || !fromTime || !toTime) {
+                alert("Please fill in all date and time fields");
+                return;
+            }
+            
+            // Show payment page
+            openTab('payment');
+        }
+
+        function backToBooking() {
+            openTab('booking');
+        }
+
+        function selectWallet(element) {
+            // Remove selected class from all wallets
+            document.querySelectorAll(".wallet-option").forEach(wallet => {
+                wallet.classList.remove("selected");
+            });
+            
+            // Add selected class to clicked wallet
+            element.classList.add("selected");
+        }
+
+        function processPayment() {
+            // Check if a wallet is selected
+            const selectedWallet = document.querySelector('.wallet-option.selected');
+            if (!selectedWallet) {
+                alert("Please select a payment method");
+                return;
+            }
+            
+            // Show success modal
+            document.getElementById("successModal").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("successModal").style.display = "none";
+            
+            // Reset everything and go back to offers
+            document.getElementById('fromDate').value = '';
+            document.getElementById('toDate').value = '';
+            document.getElementById('fromTime').value = '';
+            document.getElementById('toTime').value = '';
+            
+            document.querySelectorAll(".wallet-option").forEach(wallet => {
+                wallet.classList.remove("selected");
+            });
+            
+            openTab('offers');
+        }
+
+        // Close modal if clicked outside
+        window.onclick = function(event) {
+            const modal = document.getElementById("successModal");
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+
+</body>
+</html>

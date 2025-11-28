@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VenueEase Dashboard</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            background: #ffffff;
+            height: 100vh;
+            border-right: 1px solid #ccc;
+            position: fixed;
+            padding: 20px 10px;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 40px;
+        }
+
+        .nav a {
+            display: block;
+            padding: 12px;
+            text-decoration: none;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .nav a:hover {
+            background: #d2b39c;
+            color: #fff;
+            border-radius: 8px;
+        }
+
+        .nav a.active {
+            background: #b98e75;
+            color: #fff;
+            border-radius: 8px;
+        }
+
+        .logout {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 18px;
+            background: #b98e75;
+            color: #fff;
+            border-radius: 20px;
+            text-decoration: none;
+            display: block;
+            width: calc(100% - 40px);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        /* Main Page */
+        .main {
+            margin-left: 240px;
+            padding: 20px;
+        }
+
+        /* USER MANAGEMENT TABLE */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ccc;
+            text-align: left;
+        }
+
+        th {
+            background: #b98e75;
+            color: white;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .ban { background:#8e1c0f; }
+        .unban { background:#1f7a2f; }
+        .warn-icon { color:#c07e00; font-size:18px; }
+
+        .actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .actions button {
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: none;
+            background: #b98e75;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* DASHBOARD */
+        .card-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: #b98e75;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            width: 220px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .chart-box {
+            background: #b98e75;
+            padding: 20px;
+            border-radius: 12px;
+            height: 260px;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Chart placeholder */
+        .chart-placeholder {
+            background: rgba(255, 255, 255, 0.2);
+            height: 200px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        /* Page navigation */
+        .page-nav {
+            display: none;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 10px;
+            }
+            
+            .main {
+                margin-left: 0;
+            }
+            
+            .card-container {
+                flex-direction: column;
+            }
+            
+            .card {
+                width: auto;
+            }
+            
+            .logout {
+                position: relative;
+                bottom: auto;
+                left: auto;
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">VenueEase</div>
+        <div class="nav">
+            <a href="#" class="nav-link active" data-page="dashboard">Dashboard</a>
+            <a href="#" class="nav-link" data-page="users">Users</a>
+        </div>
+        <a class="logout" href="#">Log Out</a>
+    </div>
+
+    <div class="main">
+        <!-- Dashboard Page -->
+        <section id="dashboard-page" class="page">
+            <h2>DASHBOARD</h2>
+            <div class="card-container">
+                <div class="card"> 
+                    <h3>Total Active Users</h3>
+                    <p>106</p>
+                </div>
+                <div class="card"> 
+                    <h3>Registered Venues</h3>
+                    <p>58</p>
+                </div>
+                <div class="card"> 
+                    <h3>Avg. Visit Time</h3>
+                    <p>123.45</p>
+                </div>
+            </div>
+
+            <div class="chart-box">
+                <h3>Monthly Active Users</h3>
+                <div class="chart-placeholder">
+                    <p>Chart visualization would appear here</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Users Page -->
+        <section id="users-page" class="page" style="display: none;">
+            <h2>USER MANAGEMENT</h2>
+
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Report</th>
+                    <th>Log</th>
+                </tr>
+                <tr>
+                    <td>001</td><td>Sean de Lara</td><td>delara.sean@gmail.com</td><td>0 Warnings</td><td><button class="btn ban">BAN</button></td>
+                </tr>
+                <tr>
+                    <td>002</td><td>Jenat Iguod</td><td>iguod.jenat@gmail.com</td><td><span class="warn-icon">⚠️</span> 10 Warnings</td><td><button class="btn unban">UN-BAN</button></td>
+                </tr>
+                <tr>
+                    <td>003</td><td>Elixer Alcoba</td><td>alcobaelixer@gmail.com</td><td>9 Warnings</td><td><button class="btn ban">BAN</button></td>
+                </tr>
+                <tr>
+                    <td>004</td><td>Senior Paul</td><td>lincollo.paul@gmail.com</td><td>0 Warnings</td><td><button class="btn ban">BAN</button></td>
+                </tr>
+                <tr>
+                    <td>005</td><td>Joalfer Formento</td><td>formento.joshua@gmail.com</td><td>2 Warnings</td><td><button class="btn ban">BAN</button></td>
+                </tr>
+                <tr>
+                    <td>006</td><td>Luis Balagtas</td><td>lulu.luis@gmail.com</td><td>0 Warnings</td><td><button class="btn ban">BAN</button></td>
+                </tr>
+            </table>
+
+            <div class="actions">
+                <button>DELETE ACCOUNT</button>
+                <button>BAN MULTIPLE</button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Page navigation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const pages = document.querySelectorAll('.page');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    
+                    // Hide all pages
+                    pages.forEach(page => {
+                        page.style.display = 'none';
+                    });
+                    
+                    // Show selected page
+                    const pageId = this.getAttribute('data-page') + '-page';
+                    document.getElementById(pageId).style.display = 'block';
+                });
+            });
+            
+            // Button functionality
+            const banButtons = document.querySelectorAll('.btn.ban');
+            const unbanButtons = document.querySelectorAll('.btn.unban');
+            
+            banButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // In a real app, this would make an API call
+                    alert('User has been banned');
+                    this.textContent = 'UN-BAN';
+                    this.classList.remove('ban');
+                    this.classList.add('unban');
+                });
+            });
+            
+            unbanButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // In a real app, this would make an API call
+                    alert('User has been unbanned');
+                    this.textContent = 'BAN';
+                    this.classList.remove('unban');
+                    this.classList.add('ban');
+                });
+            });
+            
+            // Action buttons
+            const actionButtons = document.querySelectorAll('.actions button');
+            actionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    alert(`${this.textContent} functionality would be implemented here`);
+                });
+            });
+            
+            // Logout button
+            document.querySelector('.logout').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Logging out...');
+                // In a real app, this would redirect to login page
+            });
+        });
+    </script>
+</body>
+</html>
