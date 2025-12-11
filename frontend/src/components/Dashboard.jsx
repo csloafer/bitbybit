@@ -3,8 +3,6 @@ import './css/LandingPage.css';
 
 const Dashboard = ({ user, onLogout }) => {
     const [activeTab, setActiveTab] = useState('home');
-    const [expandedEvents, setExpandedEvents] = useState({});
-    const [selectedVenue, setSelectedVenue] = useState(null);
     const [bookingData, setBookingData] = useState({
         fromDate: '',
         toDate: '',
@@ -12,6 +10,7 @@ const Dashboard = ({ user, onLogout }) => {
         toTime: ''
     });
     const [selectedWallet, setSelectedWallet] = useState(null);
+    const [showQRModal, setShowQRModal] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [paymentSuccessful, setPaymentSuccessful] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
