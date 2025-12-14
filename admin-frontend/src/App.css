@@ -1,5 +1,7 @@
+/* C:\VenuEase\admin-frontend\src\App.css */
 .App {
     min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
 /* Global styles */
@@ -9,15 +11,84 @@
 
 body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
     background: white;
-    color: #111827;
+    color: #21140F;
 }
 
 button {
     font-family: inherit;
 }
 
-input, select {
+input, select, textarea {
     font-family: inherit;
+}
+
+/* Global button styles */
+.btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background: #6E4F3F;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #21140F;
+}
+
+.btn-secondary {
+    background: #EEEBED;
+    color: #6E4F3F;
+    border: 1px solid #BD9780;
+}
+
+.btn-secondary:hover {
+    background: #CEAB96;
+    color: white;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+/* Global form styles */
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #6E4F3F;
+}
+
+/* Global card styles */
+.card {
+    background: white;
+    border: 1px solid #BD9780;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+/* Global table styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #EEEBED;
+    color: #21140F;
+    border-bottom: 1px solid #BD9780;
+}
+
+td {
+    border-bottom: 1px solid #CEAB96;
+    color: #21140F;
 }

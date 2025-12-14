@@ -1,10 +1,11 @@
+// Remove EventManagement import and update App.jsx
 import React, { useState } from 'react';
 import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
 import UserManagement from './components/UserManagement';
 import VenueManagement from './components/VenueManagement';
-import EventManagement from './components/EventManagement';
 import BookingManagement from './components/BookingManagement';
+import QueryBuilder from './components/QueryBuilder';
 import './App.css';
 
 function App() {
@@ -21,6 +22,13 @@ function App() {
         setCurrentView('login');
     };
 
+    // Navigation functions
+    const navigateToDashboard = () => setCurrentView('dashboard');
+    const navigateToUsers = () => setCurrentView('users');
+    const navigateToQueryBuilder = () => setCurrentView('query');
+    const navigateToVenues = () => setCurrentView('venues');
+    const navigateToBookings = () => setCurrentView('bookings');
+
     return (
         <div className="App">
             {currentView === 'login' && (
@@ -31,44 +39,54 @@ function App() {
                 <AdminDashboard 
                     admin={admin} 
                     onLogout={handleLogout}
-                    onViewUsers={() => setCurrentView('users')}
-                    onViewVenues={() => setCurrentView('venues')}
-                    onViewEvents={() => setCurrentView('events')}
-                    onViewBookings={() => setCurrentView('bookings')}
+                    onViewUsers={navigateToUsers}
+                    onViewVenues={navigateToVenues}
+                    onViewBookings={navigateToBookings}
+                    onViewQueryBuilder={navigateToQueryBuilder}
+                    
                 />
             )}
 
             {currentView === 'users' && admin && (
                 <UserManagement 
                     admin={admin}
-                    onBack={() => setCurrentView('dashboard')}
                     onLogout={handleLogout}
+                    onViewDashboard={navigateToDashboard}
+                    onViewUsers={navigateToUsers}
+                    onViewQueryBuilder={navigateToQueryBuilder}
+                    onViewVenues={navigateToVenues}
                 />
             )}
 
             {currentView === 'venues' && admin && (
                 <VenueManagement 
                     admin={admin}
-                    onBack={() => setCurrentView('dashboard')}
                     onLogout={handleLogout}
-                />
-            )}
-
-            {currentView === 'events' && admin && (
-                <EventManagement 
-                    admin={admin}
-                    onBack={() => setCurrentView('dashboard')}
-                    onLogout={handleLogout}
+                    onViewDashboard={navigateToDashboard}
+                    onViewUsers={navigateToUsers}
+                    onViewQueryBuilder={navigateToQueryBuilder}
+                    onViewVenues={navigateToVenues}
                 />
             )}
 
             {currentView === 'bookings' && admin && (
                 <BookingManagement 
                     admin={admin}
-                    onBack={() => setCurrentView('dashboard')}
                     onLogout={handleLogout}
+                    onViewDashboard={navigateToDashboard}
+                    onViewUsers={navigateToUsers}
+                    onViewQueryBuilder={navigateToQueryBuilder}
+                    onViewVenues={navigateToVenues}
                 />
             )}
+
+            {currentView === 'query' && admin && (
+    <QueryBuilder 
+        admin={admin}
+        onLogout={handleLogout}
+        onBack={navigateToDashboard}  // CHANGE THIS LINE
+    />
+)}
         </div>
     );
 }

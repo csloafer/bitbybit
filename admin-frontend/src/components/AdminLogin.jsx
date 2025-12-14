@@ -96,11 +96,6 @@ const AdminLogin = ({ onLogin }) => {
                         <a href="mailto:developer@venueease.com" className="help-link">Contact the developer</a>
                     </div>
 
-                    <div className="admin-login-note center-text">
-                        <h4>Default Admin Accounts:</h4>
-                        <p>Email: <strong>admin@venuease.com</strong> | Password: <strong>admin123</strong></p>
-                        <p>Email: <strong>staff@venuease.com</strong> | Password: <strong>staff123</strong></p>
-                    </div>
                 </div>
             </div>
         </div>

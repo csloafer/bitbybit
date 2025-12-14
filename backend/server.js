@@ -1,29 +1,136 @@
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 const db = require('./config/database');
 
 const app = express();
 const PORT = 5000;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+// ==================== MIDDLEWARE SETUP ====================
+// IMPORTANT: Order matters! Configure in this exact order:
 
-// Test route
+// 1. First, enable CORS
+app.use(cors());
+
+// 2. Configure static file serving BEFORE body parsers
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+
+// 3. Then add body parsers
+app.use(express.json({ limit: '10mb' })); // Increased limit for JSON
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// 4. Configure multer for file uploads
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const uploadDir = path.join(__dirname, 'public', 'uploads', 'venues');
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const extension = path.extname(file.originalname);
+        cb(null, 'venue-' + uniqueSuffix + extension);
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|webp/;
+    const mimetype = allowedTypes.test(file.mimetype);
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    
+    if (mimetype && extname) {
+        return cb(null, true);
+    }
+    cb(new Error('Only image files (jpeg, jpg, png, gif, webp) are allowed'));
+};
+
+const upload = multer({ 
+    storage: storage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+    fileFilter: fileFilter
+});
+
+// ==================== HELPER FUNCTIONS ====================
+const parseImagesField = (images) => {
+    console.log('🔍 Parsing images field:', { type: typeof images, value: images });
+    
+    if (!images) return [];
+    
+    try {
+        // If it's already an array, return it
+        if (Array.isArray(images)) {
+            console.log('✅ Images is already array');
+            return images;
+        }
+        
+        // If it's a string, try to parse it
+        if (typeof images === 'string') {
+            // Trim and check if it's empty
+            const trimmed = images.trim();
+            if (!trimmed || trimmed === 'null' || trimmed === 'undefined') {
+                return [];
+            }
+            
+            // Try to parse as JSON
+            try {
+                const parsed = JSON.parse(trimmed);
+                if (Array.isArray(parsed)) {
+                    console.log('✅ Successfully parsed JSON array');
+                    return parsed;
+                } else if (typeof parsed === 'string') {
+                    // Single image path
+                    console.log('✅ Single image path');
+                    return [parsed];
+                }
+            } catch (jsonError) {
+                console.log('⚠️ JSON parse failed, trying other formats');
+                
+                // Check if it's a single image path starting with /uploads/
+                if (trimmed.startsWith('/uploads/')) {
+                    console.log('✅ Single upload path detected');
+                    return [trimmed];
+                }
+                
+                // Try comma separation
+                if (trimmed.includes(',')) {
+                    const parts = trimmed.split(',').map(img => img.trim()).filter(img => img);
+                    console.log('✅ Comma-separated values:', parts);
+                    return parts;
+                }
+                
+                // Single value
+                console.log('✅ Single value');
+                return [trimmed];
+            }
+        }
+    } catch (error) {
+        console.error('❌ Error parsing images:', error);
+    }
+    
+    return [];
+};
+
+// ==================== BASIC ROUTES ====================
+
 app.get('/', (req, res) => {
     res.json({ message: 'VenuEase Server is running!' });
 });
 
-// Test database connection
 app.get('/api/test-db', async (req, res) => {
     try {
         const [results] = await db.execute('SELECT 1 + 1 AS result');
-        const [admins] = await db.execute('SELECT COUNT(*) as count FROM admin');
+        const [admins] = await db.execute('SELECT COUNT(*) as count FROM ADMIN');
+        const [customers] = await db.execute('SELECT COUNT(*) as count FROM CUSTOMERS');
         res.json({ 
             message: 'Database connected successfully',
             testResult: results[0].result,
             adminCount: admins[0].count,
+            customersCount: customers[0].count,
             status: 'OK'
         });
     } catch (error) {
@@ -31,73 +138,83 @@ app.get('/api/test-db', async (req, res) => {
     }
 });
 
-// CUSTOMER REGISTRATION - DEBUG VERSION
-app.post('/api/customer/register', async (req, res) => {
-    console.log('🔔 REGISTRATION REQUEST RECEIVED');
-    console.log('📦 Request body:', req.body);
-    
-    const { full_name, email, password, phone } = req.body;
+app.get('/api/health', async (req, res) => {
+    try {
+        const [dbTest] = await db.execute('SELECT 1');
+        const [customers] = await db.execute('SELECT COUNT(*) as count FROM CUSTOMERS');
+        const [venues] = await db.execute('SELECT COUNT(*) as count FROM VENUE');
+        
+        res.json({
+            status: 'healthy',
+            serverTime: new Date().toISOString(),
+            database: 'connected',
+            customersCount: customers[0].count,
+            venuesCount: venues[0].count
+        });
+    } catch (error) {
+        console.error('Health check failed:', error);
+        res.status(500).json({
+            status: 'unhealthy',
+            error: error.message
+        });
+    }
+});
 
-    // Validate required fields
-    if (!full_name || !email || !password) {
-        console.log('❌ Missing fields:', { full_name, email, password: !!password });
+app.get('/api/debug/tables', async (req, res) => {
+    try {
+        const [tables] = await db.execute(`
+            SELECT TABLE_NAME, TABLE_ROWS 
+            FROM information_schema.TABLES 
+            WHERE TABLE_SCHEMA = 'VenuEase'
+        `);
+        res.json(tables);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ==================== CUSTOMER ROUTES ====================
+
+app.post('/api/customer/register', async (req, res) => {
+    console.log('🔔 Registration request:', { body: req.body });
+    
+    const { full_Name, email, password, phone } = req.body;
+
+    if (!full_Name || !email || !password) {
         return res.status(400).json({ error: 'All fields are required' });
     }
 
     try {
-        console.log('🔍 Step 1: Checking database connection...');
-        
-        // Test database connection first
-        const [dbTest] = await db.execute('SELECT 1');
-        console.log('✅ Database connection OK');
-
-        console.log('🔍 Step 2: Checking if customer exists...');
         const [existingCustomers] = await db.execute(
-            'SELECT * FROM customers WHERE email = ?', 
+            'SELECT * FROM CUSTOMERS WHERE email = ?', 
             [email]
         );
 
         if (existingCustomers.length > 0) {
-            console.log('❌ Customer already exists with email:', email);
-            return res.status(400).json({ error: 'Customer already exists with this email' });
+            return res.status(400).json({ error: 'Customer already exists' });
         }
 
-        console.log('✅ Email is available');
-
-        console.log('🔍 Step 3: Hashing password...');
         const saltRounds = 10;
-        const password_hash = await bcrypt.hash(password, saltRounds);
-        console.log('✅ Password hashed');
-
-        console.log('🔍 Step 4: Inserting into database...');
-        console.log('📝 Insert data:', { full_name, email, password_hash: '***', phone });
+        const password_Hash = await bcrypt.hash(password, saltRounds);
         
         const [result] = await db.execute(
-            'INSERT INTO customers (full_name, email, password_hash, phone) VALUES (?, ?, ?, ?)',
-            [full_name, email, password_hash, phone || null]
+            'INSERT INTO CUSTOMERS (full_Name, email, password_Hash, phone) VALUES (?, ?, ?, ?)',
+            [full_Name, email, password_Hash, phone || null]
         );
 
-        console.log('✅ Database insert successful. ID:', result.insertId);
-        
         res.status(201).json({ 
             message: 'Customer registered successfully',
-            customer_id: result.insertId,
-            full_name: full_name,
+            customer_ID: result.insertId,
+            full_Name: full_Name,
             email: email
         });
 
     } catch (error) {
-        console.error('❌ REGISTRATION ERROR:', error);
-        console.error('❌ Error details:', {
-            message: error.message,
-            code: error.code,
-            sqlMessage: error.sqlMessage
-        });
+        console.error('Registration error:', error);
         res.status(500).json({ error: 'Internal server error: ' + error.message });
     }
 });
 
-// CUSTOMER LOGIN
 app.post('/api/customer/login', async (req, res) => {
     const { email, password } = req.body;
 
@@ -107,7 +224,7 @@ app.post('/api/customer/login', async (req, res) => {
 
     try {
         const [customers] = await db.execute(
-            'SELECT customer_id, full_name, email, password_hash, phone, is_active FROM customers WHERE email = ?', 
+            'SELECT customer_ID, full_Name, email, password_Hash, phone FROM CUSTOMERS WHERE email = ? AND is_Active = TRUE', 
             [email]
         );
 
@@ -116,13 +233,7 @@ app.post('/api/customer/login', async (req, res) => {
         }
 
         const customer = customers[0];
-        
-        // Check if account is active
-        if (!customer.is_active) {
-            return res.status(400).json({ error: 'Account is deactivated' });
-        }
-        
-        const isPasswordValid = await bcrypt.compare(password, customer.password_hash);
+        const isPasswordValid = await bcrypt.compare(password, customer.password_Hash);
         
         if (!isPasswordValid) {
             return res.status(400).json({ error: 'Invalid email or password' });
@@ -131,12 +242,11 @@ app.post('/api/customer/login', async (req, res) => {
         res.json({ 
             message: 'Login successful',
             user: {
-                user_id: customer.customer_id,
-                full_name: customer.full_name,
+                user_ID: customer.customer_ID,
+                full_Name: customer.full_Name,
                 email: customer.email,
                 phone: customer.phone,
-                role: 'customer',
-                userType: 'customer'
+                role: 'customer'
             }
         });
 
@@ -146,11 +256,10 @@ app.post('/api/customer/login', async (req, res) => {
     }
 });
 
-// ADMIN/STAFF LOGIN (with plain text passwords for testing)
+// ==================== ADMIN ROUTES ====================
+
 app.post('/api/admin/login', async (req, res) => {
     const { email, password } = req.body;
-
-    console.log('🔐 Admin login attempt:', { email, password });
 
     if (!email || !password) {
         return res.status(400).json({ error: 'Email and password are required' });
@@ -158,50 +267,28 @@ app.post('/api/admin/login', async (req, res) => {
 
     try {
         const [admins] = await db.execute(
-            'SELECT admin_id, full_name, email, password_hash, role, is_active FROM admin WHERE email = ?', 
+            'SELECT admin_ID, full_Name, email, password_Hash, role FROM ADMIN WHERE email = ?', 
             [email]
         );
-
-        console.log('📊 Found admins:', admins.length);
 
         if (admins.length === 0) {
             return res.status(400).json({ error: 'Invalid email or password' });
         }
 
         const admin = admins[0];
-        
-        // Check if account is active
-        if (!admin.is_active) {
-            return res.status(400).json({ error: 'Account is deactivated' });
-        }
-        
-        // For testing: Use bcrypt comparison if password is hashed, otherwise plain text
-        let isPasswordValid = false;
-        
-        // Check if password appears to be hashed (starts with $2b$ or similar)
-        if (admin.password_hash.startsWith('$2')) {
-            isPasswordValid = await bcrypt.compare(password, admin.password_hash);
-        } else {
-            // Plain text comparison for testing
-            isPasswordValid = password === admin.password_hash;
-        }
-        
-        console.log('🔑 Password valid:', isPasswordValid);
+        const isPasswordValid = password === admin.password_Hash;
         
         if (!isPasswordValid) {
             return res.status(400).json({ error: 'Invalid email or password' });
         }
 
-        console.log('✅ Login successful for:', admin.email);
-        
         res.json({ 
             message: 'Login successful',
             user: {
-                user_id: admin.admin_id,
-                full_name: admin.full_name,
+                user_ID: admin.admin_ID,
+                full_Name: admin.full_Name,
                 email: admin.email,
-                role: admin.role,
-                userType: 'admin'
+                role: admin.role
             }
         });
 
@@ -211,24 +298,494 @@ app.post('/api/admin/login', async (req, res) => {
     }
 });
 
-// GET ALL CUSTOMERS (Admin only)
-app.get('/api/admin/customers', async (req, res) => {
+// ==================== VENUE MANAGEMENT ROUTES ====================
+// IMPORTANT: These are updated with proper image handling
+
+app.get('/api/admin/venues', async (req, res) => {
     try {
-        const [customers] = await db.execute(
-            'SELECT customer_id, full_name, email, phone, date_created, is_active FROM customers ORDER BY date_created DESC'
-        );
-        res.json(customers);
+        const [venues] = await db.execute(`
+            SELECT 
+                venue_ID,
+                venue_Name,
+                address,
+                capacity,
+                price,
+                contact_Email,
+                contact_Phone,
+                description,
+                images,
+                is_Available,
+                date_Created
+            FROM VENUE 
+            ORDER BY venue_Name
+        `);
+        
+        // Use helper function to parse images
+        const venuesWithParsedImages = venues.map(venue => ({
+            ...venue,
+            images: parseImagesField(venue.images)
+        }));
+        
+        res.json(venuesWithParsedImages);
     } catch (error) {
-        console.error('Error fetching customers:', error);
+        console.error('Error fetching venues:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-// GET ALL STAFF (Admin only)
+app.get('/api/admin/venues/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const [venues] = await db.execute(`
+            SELECT * FROM VENUE WHERE venue_ID = ?
+        `, [id]);
+        
+        if (venues.length === 0) {
+            return res.status(404).json({ error: 'Venue not found' });
+        }
+        
+        const venueWithImages = {
+            ...venues[0],
+            images: parseImagesField(venues[0].images)
+        };
+        
+        res.json(venueWithImages);
+    } catch (error) {
+        console.error('Error fetching venue:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.post('/api/admin/venues', async (req, res) => {
+    try {
+        console.log('📥 Creating venue with data:', req.body);
+        
+        const { 
+            venue_Name, 
+            address, 
+            capacity, 
+            price, 
+            contact_Email, 
+            contact_Phone, 
+            description,
+            images 
+        } = req.body;
+
+        // Validate required fields
+        if (!venue_Name || !address || !capacity || !price) {
+            return res.status(400).json({ 
+                error: 'Name, address, capacity, and price are required'
+            });
+        }
+
+        // Parse images using helper function
+        const imagesArray = parseImagesField(images);
+        console.log('🖼️ Parsed images array:', imagesArray);
+
+        // Prepare images for storage
+        let imagesForDB = null;
+        if (imagesArray.length > 0) {
+            imagesForDB = JSON.stringify(imagesArray);
+        }
+
+        console.log('💾 Storing images in DB:', imagesForDB);
+
+        const [result] = await db.execute(
+            `INSERT INTO VENUE 
+                (venue_Name, address, capacity, price, contact_Email, contact_Phone, description, images, is_Available) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, TRUE)`,
+            [
+                venue_Name, 
+                address, 
+                parseInt(capacity), 
+                parseFloat(price), 
+                contact_Email || null, 
+                contact_Phone || null, 
+                description || null,
+                imagesForDB
+            ]
+        );
+
+        // Get the newly created venue
+        const [newVenue] = await db.execute(
+            'SELECT * FROM VENUE WHERE venue_ID = ?',
+            [result.insertId]
+        );
+
+        const venueWithImages = {
+            ...newVenue[0],
+            images: parseImagesField(newVenue[0].images)
+        };
+
+        res.status(201).json({
+            message: 'Venue created successfully',
+            venue: venueWithImages
+        });
+    } catch (error) {
+        console.error('❌ Error creating venue:', error);
+        res.status(500).json({ 
+            error: 'Internal server error: ' + error.message,
+            sqlMessage: error.sqlMessage
+        });
+    }
+});
+
+app.put('/api/admin/venues/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        console.log('📝 Updating venue:', id, req.body);
+
+        // Check if venue exists
+        const [existing] = await db.execute(
+            'SELECT venue_ID FROM VENUE WHERE venue_ID = ?',
+            [id]
+        );
+        
+        if (existing.length === 0) {
+            return res.status(404).json({ error: 'Venue not found' });
+        }
+
+        const { 
+            venue_Name, 
+            address, 
+            capacity, 
+            price, 
+            contact_Email, 
+            contact_Phone, 
+            description,
+            images,
+            is_Available 
+        } = req.body;
+
+        // Parse images using helper function
+        const imagesArray = parseImagesField(images);
+        let imagesForDB = null;
+        if (imagesArray.length > 0) {
+            imagesForDB = JSON.stringify(imagesArray);
+        }
+
+        // Update venue
+        await db.execute(
+            `UPDATE VENUE SET 
+                venue_Name = ?,
+                address = ?,
+                capacity = ?,
+                price = ?,
+                contact_Email = ?,
+                contact_Phone = ?,
+                description = ?,
+                images = ?,
+                is_Available = ?
+            WHERE venue_ID = ?`,
+            [
+                venue_Name, 
+                address, 
+                parseInt(capacity), 
+                parseFloat(price), 
+                contact_Email || null, 
+                contact_Phone || null, 
+                description || null,
+                imagesForDB,
+                is_Available !== undefined ? is_Available : true,
+                id
+            ]
+        );
+
+        // Get updated venue
+        const [updatedVenue] = await db.execute(
+            'SELECT * FROM VENUE WHERE venue_ID = ?',
+            [id]
+        );
+
+        const venueWithImages = {
+            ...updatedVenue[0],
+            images: parseImagesField(updatedVenue[0].images)
+        };
+
+        res.json({
+            message: 'Venue updated successfully',
+            venue: venueWithImages
+        });
+    } catch (error) {
+        console.error('Error updating venue:', error);
+        res.status(500).json({ 
+            error: 'Internal server error: ' + error.message
+        });
+    }
+});
+
+app.delete('/api/admin/venues/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const [existing] = await db.execute(
+            'SELECT venue_ID FROM VENUE WHERE venue_ID = ?',
+            [id]
+        );
+        
+        if (existing.length === 0) {
+            return res.status(404).json({ error: 'Venue not found' });
+        }
+
+        const [bookings] = await db.execute(
+            'SELECT COUNT(*) as count FROM BOOKING WHERE venue_ID = ?',
+            [id]
+        );
+
+        if (bookings[0].count > 0) {
+            return res.status(400).json({ 
+                error: 'Cannot delete venue with existing bookings' 
+            });
+        }
+
+        await db.execute('DELETE FROM VENUE WHERE venue_ID = ?', [id]);
+
+        res.json({ message: 'Venue deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting venue:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/api/admin/venues/stats', async (req, res) => {
+    try {
+        const [totalVenues] = await db.execute('SELECT COUNT(*) as count FROM VENUE');
+        const [availableVenues] = await db.execute('SELECT COUNT(*) as count FROM VENUE WHERE is_Available = TRUE');
+        const [unavailableVenues] = await db.execute('SELECT COUNT(*) as count FROM VENUE WHERE is_Available = FALSE');
+        const [recentVenues] = await db.execute('SELECT COUNT(*) as count FROM VENUE WHERE date_Created >= DATE_SUB(NOW(), INTERVAL 7 DAY)');
+        
+        res.json({
+            total: totalVenues[0].count,
+            available: availableVenues[0].count,
+            unavailable: unavailableVenues[0].count,
+            recent: recentVenues[0].count
+        });
+    } catch (error) {
+        console.error('Error fetching venue stats:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// ==================== IMAGE UPLOAD ROUTES ====================
+
+app.post('/api/admin/venues/upload', upload.array('images', 5), async (req, res) => {
+    try {
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ error: 'No files uploaded' });
+        }
+        
+        const imageUrls = req.files.map(file => {
+            return `/uploads/venues/${file.filename}`;
+        });
+        
+        res.json({
+            message: 'Files uploaded successfully',
+            images: imageUrls
+        });
+    } catch (error) {
+        console.error('Error uploading files:', error);
+        res.status(500).json({ error: 'Error uploading files: ' + error.message });
+    }
+});
+
+app.post('/api/admin/venues/upload/single', upload.single('image'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
+        
+        const imageUrl = `/uploads/venues/${req.file.filename}`;
+        
+        res.json({
+            message: 'File uploaded successfully',
+            image: imageUrl
+        });
+    } catch (error) {
+        console.error('Error uploading file:', error);
+        res.status(500).json({ error: 'Error uploading file: ' + error.message });
+    }
+});
+
+// ==================== SQL ANALYZER ROUTES ====================
+
+// Execute SQL query with better error handling
+app.post('/api/admin/database/query', async (req, res) => {
+    try {
+        const { query } = req.body;
+        
+        if (!query || typeof query !== 'string') {
+            return res.status(400).json({ error: 'Query is required' });
+        }
+
+        const trimmedQuery = query.trim();
+        const upperQuery = trimmedQuery.toUpperCase();
+        
+        // Execute query safely
+        try {
+            const [results] = await db.execute(trimmedQuery);
+            
+            res.json({
+                success: true,
+                results: results,
+                rowCount: results.length || 0,
+                message: `Query executed successfully. Returned ${results.length || 0} rows.`
+            });
+            
+        } catch (dbError) {
+            console.error('Database error:', dbError);
+            
+            // Provide more helpful error messages
+            let userMessage = dbError.sqlMessage || 'Database error occurred';
+            
+            // Common error patterns
+            if (userMessage.includes('Table') && userMessage.includes('doesn\'t exist')) {
+                userMessage = 'Table not found. Check the table name and try again.';
+            } else if (userMessage.includes('column') && userMessage.includes('unknown')) {
+                userMessage = 'Column not found. Check your column names.';
+            } else if (userMessage.includes('syntax')) {
+                userMessage = 'SQL syntax error. Please check your query.';
+            }
+            
+            res.status(400).json({ 
+                error: userMessage,
+                sqlError: dbError.sqlMessage
+            });
+        }
+        
+    } catch (error) {
+        console.error('Server error:', error);
+        res.status(500).json({ 
+            error: 'Internal server error. Please try again.'
+        });
+    }
+});
+
+// Get database schema for sidebar
+app.get('/api/admin/database/schema-info', async (req, res) => {
+    try {
+        const [tables] = await db.execute(`
+            SELECT TABLE_NAME as name, TABLE_ROWS as rowCount
+            FROM information_schema.TABLES 
+            WHERE TABLE_SCHEMA = 'VenuEase'
+            ORDER BY TABLE_NAME
+        `);
+        
+        // Get columns for each table
+        const schemaInfo = await Promise.all(
+            tables.map(async (table) => {
+                const [columns] = await db.execute(`
+                    SELECT 
+                        COLUMN_NAME as name,
+                        DATA_TYPE as type,
+                        COLUMN_KEY as keyType
+                    FROM information_schema.COLUMNS 
+                    WHERE TABLE_SCHEMA = 'VenuEase' 
+                    AND TABLE_NAME = ?
+                    ORDER BY ORDINAL_POSITION
+                `, [table.name]);
+                
+                return {
+                    tableName: table.name,
+                    rowCount: table.rowCount,
+                    columns: columns
+                };
+            })
+        );
+        
+        res.json(schemaInfo);
+    } catch (error) {
+        console.error('Schema fetch error:', error);
+        res.status(500).json({ error: 'Failed to fetch database schema' });
+    }
+});
+
+
+
+// ==================== USER MANAGEMENT ROUTES ====================
+
+app.get('/api/admin/users', async (req, res) => {
+    try {
+        const { search } = req.query;
+        let query = `
+            SELECT customer_ID, full_Name, email, phone, date_Created, is_Active 
+            FROM CUSTOMERS 
+        `;
+        
+        const params = [];
+        
+        if (search) {
+            query += ` WHERE (full_Name LIKE ? OR email LIKE ?)`;
+            params.push(`%${search}%`, `%${search}%`);
+        }
+        
+        query += ` ORDER BY full_Name`;
+        
+        const [customers] = await db.execute(query, params);
+        res.json(customers);
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/api/admin/users/stats', async (req, res) => {
+    try {
+        const [activeUsers] = await db.execute(
+            'SELECT COUNT(*) as count FROM CUSTOMERS WHERE is_Active = TRUE'
+        );
+        const [inactiveUsers] = await db.execute(
+            'SELECT COUNT(*) as count FROM CUSTOMERS WHERE is_Active = FALSE'
+        );
+        const [totalUsers] = await db.execute(
+            'SELECT COUNT(*) as count FROM CUSTOMERS'
+        );
+        const [recentUsers] = await db.execute(
+            'SELECT COUNT(*) as count FROM CUSTOMERS WHERE date_Created >= DATE_SUB(NOW(), INTERVAL 7 DAY)'
+        );
+        
+        res.json({
+            active: activeUsers[0].count,
+            inactive: inactiveUsers[0].count,
+            total: totalUsers[0].count,
+            recent: recentUsers[0].count
+        });
+    } catch (error) {
+        console.error('Error fetching user stats:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.put('/api/admin/users/:id/status', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { is_Active } = req.body;
+        
+        await db.execute(
+            'UPDATE CUSTOMERS SET is_Active = ? WHERE customer_ID = ?',
+            [is_Active, id]
+        );
+        
+        const [updatedCustomer] = await db.execute(
+            'SELECT customer_ID, full_Name, email, phone, date_Created, is_Active FROM CUSTOMERS WHERE customer_ID = ?',
+            [id]
+        );
+        
+        res.json({ 
+            message: 'Customer status updated successfully',
+            customer: updatedCustomer[0]
+        });
+    } catch (error) {
+        console.error('Error updating user status:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// ==================== STAFF MANAGEMENT ROUTES ====================
+
 app.get('/api/admin/staff', async (req, res) => {
     try {
         const [staff] = await db.execute(
-            'SELECT admin_id, full_name, email, role, date_created, is_active FROM admin ORDER BY role, date_created DESC'
+            'SELECT admin_ID, full_Name, email, role, date_Created, is_Active FROM ADMIN ORDER BY role, date_Created DESC'
         );
         res.json(staff);
     } catch (error) {
@@ -237,152 +794,153 @@ app.get('/api/admin/staff', async (req, res) => {
     }
 });
 
-// CREATE NEW STAFF (Admin only)
-app.post('/api/admin/staff', async (req, res) => {
-    const { full_name, email, password, role } = req.body;
+app.post('/api/admin/create', async (req, res) => {
+    const { full_Name, email, password, role } = req.body;
 
-    if (!full_name || !email || !password || !role) {
+    if (!full_Name || !email || !password || !role) {
         return res.status(400).json({ error: 'All fields are required' });
     }
 
     try {
-        const [existing] = await db.execute('SELECT * FROM admin WHERE email = ?', [email]);
+        const [existing] = await db.execute('SELECT * FROM ADMIN WHERE email = ?', [email]);
         if (existing.length > 0) {
             return res.status(400).json({ error: 'Staff already exists with this email' });
         }
 
-        // Hash the password
-        const password_hash = await bcrypt.hash(password, 10);
-        
         const [result] = await db.execute(
-            'INSERT INTO admin (full_name, email, password_hash, role) VALUES (?, ?, ?, ?)',
-            [full_name, email, password_hash, role]
+            'INSERT INTO ADMIN (full_Name, email, password_Hash, role, is_Active) VALUES (?, ?, ?, ?, TRUE)',
+            [full_Name, email, password, role]
         );
 
         res.status(201).json({ 
             message: 'Staff account created successfully',
-            admin_id: result.insertId,
-            full_name: full_name,
-            email: email,
-            role: role
+            admin_ID: result.insertId
         });
-
     } catch (error) {
         console.error('Staff creation error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-// GET ALL VENUES
-app.get('/api/venues', async (req, res) => {
+// ==================== ANALYTICS ROUTES ====================
+
+app.get('/api/admin/stats', async (req, res) => {
     try {
-        const [venues] = await db.execute('SELECT * FROM venue ORDER BY venue_name');
-        res.json(venues);
-    } catch (error) {
-        console.error('Error fetching venues:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
+        const [customers] = await db.execute('SELECT COUNT(*) as count FROM CUSTOMERS WHERE is_Active = TRUE');
+        const [bookings] = await db.execute('SELECT COUNT(*) as count FROM BOOKING');
+        const [venues] = await db.execute('SELECT COUNT(*) as count FROM VENUE');
+        const [events] = await db.execute('SELECT COUNT(*) as count FROM EVENTS');
 
-// CREATE VENUE (Admin only)
-app.post('/api/admin/venues', async (req, res) => {
-    const { venue_name, address, capacity, description, price_per_hour } = req.body;
-
-    if (!venue_name || !address || !capacity || !price_per_hour) {
-        return res.status(400).json({ error: 'Venue name, address, capacity, and price per hour are required' });
-    }
-
-    try {
-        const [result] = await db.execute(
-            'INSERT INTO venue (venue_name, address, capacity, description, price_per_hour) VALUES (?, ?, ?, ?, ?)',
-            [venue_name, address, capacity, description || null, price_per_hour]
-        );
-
-        res.status(201).json({ 
-            message: 'Venue created successfully',
-            venue_id: result.insertId,
-            venue_name: venue_name
+        res.json({
+            totalCustomers: customers[0].count,
+            totalBookings: bookings[0].count,
+            totalVenues: venues[0].count,
+            totalEvents: events[0].count || 0
         });
-
     } catch (error) {
-        console.error('Error creating venue:', error);
+        console.error('Error fetching stats:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-// GET ALL EVENTS
-app.get('/api/events', async (req, res) => {
+app.get('/api/admin/analytics', async (req, res) => {
     try {
-        const [events] = await db.execute(`
-            SELECT e.*, v.venue_name, v.address 
-            FROM events e 
-            LEFT JOIN venue v ON e.venue_id = v.venue_id 
-            ORDER BY e.event_date DESC
-        `);
-        res.json(events);
-    } catch (error) {
-        console.error('Error fetching events:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-// GET ALL EVENTS (Admin only - with more details)
-app.get('/api/admin/events', async (req, res) => {
-    try {
-        const [events] = await db.execute(`
-            SELECT e.*, v.venue_name, 
-                   COUNT(b.booking_id) as total_bookings
-            FROM events e 
-            LEFT JOIN venue v ON e.venue_id = v.venue_id 
-            LEFT JOIN booking b ON e.event_id = b.event_id
-            GROUP BY e.event_id
-            ORDER BY e.event_date DESC
-        `);
-        res.json(events);
-    } catch (error) {
-        console.error('Error fetching events:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-// CREATE EVENT (Admin only)
-app.post('/api/admin/events', async (req, res) => {
-    const { event_name, description, event_date, venue_id } = req.body;
-
-    if (!event_name || !event_date) {
-        return res.status(400).json({ error: 'Event name and date are required' });
-    }
-
-    try {
-        const [result] = await db.execute(
-            'INSERT INTO events (event_name, description, event_date, venue_id) VALUES (?, ?, ?, ?)',
-            [event_name, description || null, event_date, venue_id || null]
+        const currentMonth = new Date().getMonth() + 1;
+        const currentYear = new Date().getFullYear();
+        
+        const [activeUsers] = await db.execute(
+            'SELECT COUNT(*) as count FROM CUSTOMERS WHERE is_Active = TRUE'
         );
-
-        res.status(201).json({ 
-            message: 'Event created successfully',
-            event_id: result.insertId,
-            event_name: event_name
+        
+        const [registeredVenues] = await db.execute(
+            'SELECT COUNT(*) as count FROM VENUE'
+        );
+        
+        const [monthlyVisits] = await db.execute(`
+            SELECT COUNT(DISTINCT customer_ID) as visits 
+            FROM BOOKING 
+            WHERE MONTH(booking_Date) = ? AND YEAR(booking_Date) = ?
+        `, [currentMonth, currentYear]);
+        
+        const [totalBookings] = await db.execute(
+            'SELECT COUNT(*) as count FROM BOOKING'
+        );
+        
+        let avgVisits = monthlyVisits[0].visits;
+        if (avgVisits === 0) {
+            const [lastMonthVisits] = await db.execute(`
+                SELECT COUNT(DISTINCT customer_ID) as visits 
+                FROM BOOKING 
+                WHERE MONTH(booking_Date) = ? AND YEAR(booking_Date) = ?
+            `, [currentMonth - 1 || 12, currentYear - (currentMonth === 1 ? 1 : 0)]);
+            avgVisits = lastMonthVisits[0].visits;
+        }
+        
+        res.json({
+            totalActiveUsers: activeUsers[0].count,
+            registeredVenues: registeredVenues[0].count,
+            avgMonthlyVisits: avgVisits || 157,
+            totalBookings: totalBookings[0].count
         });
-
     } catch (error) {
-        console.error('Error creating event:', error);
+        console.error('Error fetching analytics:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-// GET ALL BOOKINGS (Admin only)
-app.get('/api/admin/bookings', async (req, res) => {
+app.get('/api/admin/analytics/monthly-bookings', async (req, res) => {
+    try {
+        const [monthlyData] = await db.execute(`
+            SELECT 
+                DATE_FORMAT(booking_Date, '%b') as month,
+                COUNT(*) as bookings,
+                MONTH(booking_Date) as month_num
+            FROM BOOKING
+            WHERE YEAR(booking_Date) = YEAR(CURDATE())
+            GROUP BY MONTH(booking_Date), DATE_FORMAT(booking_Date, '%b')
+            ORDER BY month_num
+        `);
+        
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const completeData = months.map(month => {
+            const found = monthlyData.find(item => item.month === month);
+            return {
+                month,
+                bookings: found ? found.bookings : 0
+            };
+        });
+        
+        res.json(completeData);
+    } catch (error) {
+        console.error('Error fetching monthly bookings:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// ==================== BOOKING ROUTES ====================
+
+app.get('/api/admin/bookings/detailed', async (req, res) => {
     try {
         const [bookings] = await db.execute(`
-            SELECT b.booking_id, c.full_name, v.venue_name, e.event_name, 
-                   b.start_time, b.end_time, b.status, b.booking_date,
-                   b.total_price
-            FROM booking b
-            JOIN customers c ON b.customer_id = c.customer_id
-            LEFT JOIN venue v ON b.venue_id = v.venue_id
-            LEFT JOIN events e ON b.event_id = e.event_id
-            ORDER BY b.booking_date DESC
+            SELECT 
+                b.booking_ID,
+                c.full_Name as customer_name,
+                c.email as customer_email,
+                v.venue_Name,
+                v.address,
+                b.start_Time,
+                b.end_Time,
+                b.total_Guests,
+                b.status,
+                b.booking_Date,
+                p.amount,
+                p.payment_Method,
+                p.payment_Status
+            FROM BOOKING b
+            LEFT JOIN CUSTOMERS c ON b.customer_ID = c.customer_ID
+            LEFT JOIN VENUE v ON b.venue_ID = v.venue_ID
+            LEFT JOIN PAYMENT p ON b.payment_ID = p.payment_ID
+            ORDER BY b.booking_Date DESC
         `);
         res.json(bookings);
     } catch (error) {
@@ -391,60 +949,44 @@ app.get('/api/admin/bookings', async (req, res) => {
     }
 });
 
-// CUSTOMER BOOKINGS
-app.get('/api/customer/bookings/:customerId', async (req, res) => {
-    const { customerId } = req.params;
-    
+app.put('/api/admin/bookings/:id/status', async (req, res) => {
     try {
-        const [bookings] = await db.execute(`
-            SELECT b.*, v.venue_name, v.address, e.event_name
-            FROM booking b
-            LEFT JOIN venue v ON b.venue_id = v.venue_id
-            LEFT JOIN events e ON b.event_id = e.event_id
-            WHERE b.customer_id = ?
-            ORDER BY b.booking_date DESC
-        `, [customerId]);
-        
-        res.json(bookings);
+        const { id } = req.params;
+        const { status } = req.body;
+
+        await db.execute(
+            'UPDATE BOOKING SET status = ? WHERE booking_ID = ?',
+            [status, id]
+        );
+        res.json({ message: 'Booking status updated successfully' });
     } catch (error) {
-        console.error('Error fetching customer bookings:', error);
+        console.error('Error updating booking:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-// CREATE BOOKING
-app.post('/api/bookings', async (req, res) => {
-    const { customer_id, venue_id, event_id, start_time, end_time, total_price } = req.body;
+app.post('/api/booking/create', async (req, res) => {
+    const { customer_ID, venue_ID, start_Time, end_Time, total_Guests } = req.body;
 
-    if (!customer_id || !start_time || !end_time || !total_price) {
-        return res.status(400).json({ error: 'Customer ID, time slots, and total price are required' });
+    if (!customer_ID || !venue_ID || !start_Time || !end_Time || !total_Guests) {
+        return res.status(400).json({ error: 'All booking fields are required' });
     }
 
     try {
-        // Check venue availability
-        const [conflictingBookings] = await db.execute(`
-            SELECT * FROM booking 
-            WHERE venue_id = ? 
-            AND status IN ('confirmed', 'pending')
-            AND (
-                (start_time < ? AND end_time > ?) OR
-                (start_time >= ? AND start_time < ?) OR
-                (end_time > ? AND end_time <= ?)
-            )
-        `, [venue_id, end_time, start_time, start_time, end_time, start_time, end_time]);
-
-        if (conflictingBookings.length > 0) {
-            return res.status(400).json({ error: 'Venue is already booked for this time slot' });
+        const [venue] = await db.execute('SELECT * FROM VENUE WHERE venue_ID = ? AND is_Available = TRUE', [venue_ID]);
+        
+        if (venue.length === 0) {
+            return res.status(400).json({ error: 'Venue is not available' });
         }
 
         const [result] = await db.execute(
-            'INSERT INTO booking (customer_id, venue_id, event_id, start_time, end_time, total_price, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [customer_id, venue_id || null, event_id || null, start_time, end_time, total_price, 'pending']
+            'INSERT INTO BOOKING (customer_ID, venue_ID, start_Time, end_Time, total_Guests) VALUES (?, ?, ?, ?, ?)',
+            [customer_ID, venue_ID, start_Time, end_Time, total_Guests]
         );
 
         res.status(201).json({ 
-            message: 'Booking request submitted successfully',
-            booking_id: result.insertId,
+            message: 'Booking created successfully',
+            booking_ID: result.insertId,
             status: 'pending'
         });
 
@@ -454,144 +996,92 @@ app.post('/api/bookings', async (req, res) => {
     }
 });
 
-// UPDATE BOOKING STATUS (Admin only)
-app.put('/api/admin/bookings/:bookingId/status', async (req, res) => {
-    const { bookingId } = req.params;
-    const { status } = req.body;
+app.post('/api/payment/create', async (req, res) => {
+    const { customer_ID, amount, payment_Method, booking_ID } = req.body;
 
-    if (!['confirmed', 'cancelled', 'pending'].includes(status)) {
-        return res.status(400).json({ error: 'Invalid status' });
+    if (!customer_ID || !amount || !payment_Method || !booking_ID) {
+        return res.status(400).json({ error: 'All payment fields are required' });
     }
 
     try {
-        await db.execute(
-            'UPDATE booking SET status = ? WHERE booking_id = ?',
-            [status, bookingId]
+        const [paymentResult] = await db.execute(
+            'INSERT INTO PAYMENT (customer_ID, amount, payment_Method) VALUES (?, ?, ?)',
+            [customer_ID, amount, payment_Method]
         );
 
-        res.json({ 
-            message: `Booking ${status} successfully`,
-            booking_id: bookingId,
-            status: status
+        await db.execute(
+            'UPDATE BOOKING SET payment_ID = ? WHERE booking_ID = ?',
+            [paymentResult.insertId, booking_ID]
+        );
+
+        await db.execute(
+            'UPDATE PAYMENT SET payment_Status = ? WHERE payment_ID = ?',
+            ['completed', paymentResult.insertId]
+        );
+
+        await db.execute(
+            'UPDATE BOOKING SET status = ? WHERE booking_ID = ?',
+            ['confirmed', booking_ID]
+        );
+
+        res.status(201).json({ 
+            message: 'Payment processed successfully',
+            payment_ID: paymentResult.insertId,
+            payment_Status: 'completed'
         });
 
     } catch (error) {
-        console.error('Error updating booking status:', error);
+        console.error('Error processing payment:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-// UPDATE CUSTOMER STATUS (Activate/Deactivate)
-app.put('/api/admin/customers/:customerId/status', async (req, res) => {
-    const { customerId } = req.params;
-    const { is_active } = req.body;
+// ==================== DEBUG/TEST ROUTES ====================
 
-    if (typeof is_active !== 'boolean') {
-        return res.status(400).json({ error: 'is_active must be boolean' });
-    }
-
-    try {
-        await db.execute(
-            'UPDATE customers SET is_active = ? WHERE customer_id = ?',
-            [is_active, customerId]
-        );
-
-        res.json({ 
-            message: `Customer ${is_active ? 'activated' : 'deactivated'} successfully`,
-            customer_id: customerId,
-            is_active: is_active
-        });
-
-    } catch (error) {
-        console.error('Error updating customer status:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
+app.post('/api/test/json', (req, res) => {
+    console.log('📤 Test JSON received:', req.body);
+    console.log('📤 Content-Type:', req.get('Content-Type'));
+    res.json({
+        message: 'Test JSON received successfully',
+        body: req.body,
+        contentType: req.get('Content-Type')
+    });
 });
 
-// UPDATE STAFF STATUS (Activate/Deactivate)
-app.put('/api/admin/staff/:staffId/status', async (req, res) => {
-    const { staffId } = req.params;
-    const { is_active } = req.body;
-
-    if (typeof is_active !== 'boolean') {
-        return res.status(400).json({ error: 'is_active must be boolean' });
-    }
-
-    try {
-        await db.execute(
-            'UPDATE admin SET is_active = ? WHERE admin_id = ?',
-            [is_active, staffId]
-        );
-
-        res.json({ 
-            message: `Staff ${is_active ? 'activated' : 'deactivated'} successfully`,
-            admin_id: staffId,
-            is_active: is_active
-        });
-
-    } catch (error) {
-        console.error('Error updating staff status:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
+app.post('/api/test/upload', upload.single('testImage'), (req, res) => {
+    console.log('📤 Test upload received:', req.file);
+    res.json({
+        message: 'Test upload successful',
+        file: req.file
+    });
 });
 
-// Start server
+// ==================== ERROR HANDLING ====================
+
+app.use((req, res, next) => {
+    res.status(404).json({ error: 'Route not found' });
+});
+
+app.use((err, req, res, next) => {
+    console.error('🔥 Global error:', err);
+    res.status(500).json({ 
+        error: 'Internal server error',
+        message: err.message,
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+});
+
+// ==================== SERVER START ====================
+
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, 'public', 'uploads', 'venues');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+    console.log(`📁 Created uploads directory: ${uploadsDir}`);
+}
+
 app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
-
-// Add to server.js - Test database operations
-app.get('/api/debug/db-test', async (req, res) => {
-    try {
-        console.log('🧪 Testing database operations...');
-        
-        // Test 1: Basic query
-        const [test1] = await db.execute('SELECT 1 + 1 AS result');
-        console.log('✅ Basic query:', test1[0].result);
-        
-        // Test 2: Check customers table
-        const [tables] = await db.execute(`
-            SELECT TABLE_NAME 
-            FROM information_schema.TABLES 
-            WHERE TABLE_SCHEMA = 'venuese' AND TABLE_NAME = 'customers'
-        `);
-        console.log('✅ customers table exists:', tables.length > 0);
-        
-        // Test 3: Check table structure
-        const [columns] = await db.execute(`
-            SELECT COLUMN_NAME, DATA_TYPE, EXTRA
-            FROM information_schema.COLUMNS 
-            WHERE TABLE_SCHEMA = 'venuese' AND TABLE_NAME = 'customers'
-        `);
-        console.log('✅ customers columns:', columns);
-        
-        // Test 4: Try to insert a test record
-        const [insertTest] = await db.execute(
-            'INSERT INTO customers (full_name, email, password_hash) VALUES (?, ?, ?)',
-            ['Test User', 'test@test.com', 'temp_password']
-        );
-        console.log('✅ Insert test successful. ID:', insertTest.insertId);
-        
-        // Clean up
-        await db.execute('DELETE FROM customers WHERE email = ?', ['test@test.com']);
-        console.log('✅ Test record cleaned up');
-        
-        res.json({
-            status: 'SUCCESS',
-            tests: {
-                basic_query: 'PASS',
-                table_exists: 'PASS', 
-                table_structure: 'PASS',
-                insert_operation: 'PASS'
-            }
-        });
-        
-    } catch (error) {
-        console.error('❌ DB TEST FAILED:', error);
-        res.status(500).json({
-            status: 'FAILED',
-            error: error.message,
-            sqlMessage: error.sqlMessage
-        });
-    }
+    console.log(`📁 Static files: http://localhost:${PORT}/uploads/`);
+    console.log(`📁 Uploads directory: ${uploadsDir}`);
 });

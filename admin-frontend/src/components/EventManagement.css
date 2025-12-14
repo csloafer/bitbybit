@@ -19,21 +19,21 @@
 
 .events-stats .stat-card {
     background: white;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #BD9780;
     border-radius: 12px;
     padding: 24px;
     text-align: center;
 }
 
 .events-stats .stat-card h3 {
-    color: #6b7280;
+    color: #6E4F3F;
     font-size: 14px;
     font-weight: 500;
     margin-bottom: 8px;
 }
 
 .events-stats .stat-card p {
-    color: #111827;
+    color: #21140F;
     font-size: 32px;
     font-weight: 700;
     margin: 0;
@@ -41,19 +41,35 @@
 
 .events-list {
     background: white;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #BD9780;
     border-radius: 12px;
     padding: 24px;
 }
 
 .events-list h3 {
-    color: #111827;
+    color: #21140F;
     font-size: 20px;
     font-weight: 600;
     margin-bottom: 16px;
 }
 
 .events-list p {
-    color: #6b7280;
+    color: #6E4F3F;
     margin: 0;
+}
+
+/* Header styles matching other components */
+.admin-header {
+    background: #EEEBED;
+    border-bottom: 1px solid #BD9780;
+    padding: 0;
+}
+
+.admin-header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
