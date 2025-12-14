@@ -62,76 +62,97 @@ const upload = multer({
 
 // ==================== HELPER FUNCTIONS ====================
 const parseImagesField = (images) => {
-    console.log('🔍 Parsing images field:', { type: typeof images, value: images });
+    console.log('🔍 parseImagesField input:', { type: typeof images, value: images });
     
-    if (!images) return [];
+    if (!images) {
+        console.log('⚠️ No images field');
+        return [];
+    }
     
     try {
         // If it's already an array, return it
         if (Array.isArray(images)) {
-            return images.map(img => {
-                // Convert full URLs to relative paths if needed
-                if (img.startsWith('http://localhost:5000')) {
-                    return img.replace('http://localhost:5000', '');
-                }
-                return img;
-            });
+            console.log('✅ Already an array:', images);
+            return images;
         }
         
         // If it's a string, try to parse it
         if (typeof images === 'string') {
             const trimmed = images.trim();
-            if (!trimmed || trimmed === 'null' || trimmed === 'undefined') {
+            console.log('📝 Trimmed string:', trimmed);
+            
+            if (!trimmed || trimmed === 'null' || trimmed === 'undefined' || trimmed === '[]' || trimmed === '""') {
+                console.log('⚠️ Empty images string');
                 return [];
             }
             
             try {
+                // Try to parse as JSON
                 const parsed = JSON.parse(trimmed);
+                console.log('✅ Parsed as JSON:', parsed);
                 if (Array.isArray(parsed)) {
-                    return parsed.map(img => {
-                        if (img.startsWith('http://localhost:5000')) {
-                            return img.replace('http://localhost:5000', '');
-                        }
-                        return img;
-                    });
+                    return parsed;
                 }
             } catch (jsonError) {
-                // Not JSON, return as single item array
-                const img = trimmed.startsWith('http://localhost:5000') 
-                    ? trimmed.replace('http://localhost:5000', '')
-                    : trimmed;
-                return [img];
+                console.log('⚠️ Not JSON, trying other formats:', jsonError.message);
+                
+                // Check if it's a single image path
+                if (trimmed.includes('/uploads/') || trimmed.includes('venue-')) {
+                    console.log('✅ Single image path detected:', trimmed);
+                    return [trimmed];
+                }
+                
+                // Check if it's comma-separated
+                if (trimmed.includes(',')) {
+                    const images = trimmed.split(',').map(img => img.trim()).filter(img => img);
+                    console.log('✅ Comma-separated images:', images);
+                    return images;
+                }
             }
         }
     } catch (error) {
         console.error('❌ Error parsing images:', error);
     }
     
+    console.log('⚠️ Returning empty array');
     return [];
 };
 
 // Helper function to ensure proper image URLs
+// Helper function to ensure proper image URLs
 const ensureImageUrl = (imagePath) => {
-    if (!imagePath || imagePath === 'null' || imagePath === 'undefined') {
-        return 'https://via.placeholder.com/800x400?text=No+Venue+Image';
+    console.log('🔍 ensureImageUrl input:', imagePath, 'type:', typeof imagePath);
+    
+    if (!imagePath || imagePath === 'null' || imagePath === 'undefined' || imagePath === '' || imagePath === '[]') {
+        console.log('⚠️ No image path provided, using placeholder');
+        return 'https://via.placeholder.com/800x400?text=Venue+Image';
     }
     
     // If it's already a full URL, return it
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+        console.log('✅ Already a full URL:', imagePath);
         return imagePath;
     }
     
+    // Remove any quotes or brackets
+    let cleanPath = imagePath.replace(/['"\[\]]/g, '');
+    
     // If it's a relative path starting with /uploads/, add base URL
-    if (imagePath.startsWith('/uploads/')) {
-        return `http://localhost:5000${imagePath}`;
+    if (cleanPath.startsWith('/uploads/')) {
+        const url = `http://localhost:5000${cleanPath}`;
+        console.log('✅ Constructed URL from relative path:', url);
+        return url;
     }
     
     // If it's just a filename, construct the full path
-    if (imagePath && !imagePath.startsWith('/') && imagePath.includes('.')) {
-        return `http://localhost:5000/uploads/venues/${imagePath}`;
+    if (cleanPath && cleanPath.includes('.')) {
+        const url = `http://localhost:5000/uploads/venues/${cleanPath}`;
+        console.log('✅ Constructed URL from filename:', url);
+        return url;
     }
     
-    return 'https://via.placeholder.com/800x400?text=No+Venue+Image';
+    console.log('⚠️ Could not parse image path, using placeholder');
+    return 'https://via.placeholder.com/800x400?text=Venue+Image';
 };
 
 // ==================== BASIC ROUTES ====================

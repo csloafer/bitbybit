@@ -832,6 +832,294 @@ input::placeholder {
     margin: 0 auto;
 }
 
+/* ===== DASHBOARD HOME (IMAGE-BASED LAYOUT) ===== */
+
+/* Hero banner */
+.home-hero {
+    width: 100%;
+    margin: 0 0 25px 0;
+}
+
+.home-hero img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+/* Popular venues label */
+.popular-label {
+    display: inline-block;
+    background: #d9b7a3;
+    color: #000;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-weight: bold;
+    margin: 10px 0 20px 0;
+}
+
+/* Popular venue layout */
+.popular-venue {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    background: transparent;
+}
+
+/* Image left */
+.popular-venue img {
+    width: 360px;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+/* Text right */
+.popular-content {
+    flex: 1;
+    color: #333;
+    line-height: 1.7;
+    font-size: 15px;
+}
+
+/* Read more aligned right */
+.popular-content .read-more-btn {
+    margin-top: 15px;
+    float: right;
+}
+
+/* Loading and Error States */
+.loading {
+    text-align: center;
+    padding: 40px;
+    font-size: 18px;
+    color: #666;
+}
+
+.error {
+    text-align: center;
+    padding: 40px;
+    color: #ff4444;
+    background-color: #ffe6e6;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.popular-venue h3 {
+    margin-top: 0;
+    color: #333;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.popular-content p {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.popular-content strong {
+    color: #333;
+}
+
+/* ===== VENUES TAB STYLES ===== */
+
+/* Venues Header */
+.venues-header {
+    padding: 20px 40px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+}
+
+.selected-venue-notice {
+    background-color: #f9f5f2;
+    padding: 8px 16px;
+    border-radius: 4px;
+    border-left: 4px solid #bd9780;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Venues Grid */
+.venues-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    padding: 40px;
+}
+
+.venue-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.venue-card.selected-venue-highlight {
+    border: 3px solid #bd9780;
+    box-shadow: 0 0 20px rgba(189, 151, 128, 0.5);
+    transform: translateY(-5px);
+}
+
+.venue-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.venue-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.venue-card-content {
+    padding: 20px;
+}
+
+.venue-card-content h3 {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 1.25rem;
+}
+
+.venue-address {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+.venue-description {
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.venue-details {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+}
+
+.capacity {
+    color: #666;
+}
+
+.price {
+    color: #bd9780;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.view-details-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #f8f8f8;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.view-details-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.book-now-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #bd9780;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+}
+
+.book-now-btn:hover {
+    background-color: #a87f68;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #bd9780;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Back button styles */
+
+/* Single Venue Detail View */
+.venue-detail-container {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    margin: 20px 40px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.venue-detail-image {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.venue-detail-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 40px;
+}
+
+.venue-detail-content h2 {
+    color: #bd9780;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.booking-summary-card {
+    background: #f8f8f8;
+    padding: 25px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.booking-summary-card h3 {
+    color: #bd9780;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.booking-summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.booking-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #bd9780;
+}
+
 /* ===== ANIMATIONS ===== */
 @keyframes fadeInUp {
     from {
@@ -951,6 +1239,34 @@ input::placeholder {
 
     .feature-item h4 {
         font-size: 1.1rem;
+    }
+    
+    /* Venues Responsive */
+    .venues-header {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px 20px;
+        text-align: center;
+    }
+    
+    .venues-grid {
+        grid-template-columns: 1fr;
+        padding: 20px;
+        gap: 20px;
+    }
+    
+    .venue-detail-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .venue-detail-container {
+        margin: 10px;
+        padding: 20px;
+    }
+    
+    .venue-detail-image {
+        height: 250px;
     }
 }
 
@@ -1072,6 +1388,18 @@ input::placeholder {
     .reviews {
         grid-template-columns: 1fr;
     }
+    
+    /* Venues Tablet */
+    .venues-grid {
+        grid-template-columns: repeat(2, 1fr);
+        padding: 30px;
+        gap: 20px;
+    }
+    
+    .venue-detail-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1135,6 +1463,7 @@ input::placeholder {
     color: #bd9780;
 }
 
+/* Loading Spinner */
 .loading-spinner {
     border: 4px solid rgba(0, 0, 0, 0.1);
     border-radius: 50%;
@@ -1149,93 +1478,54 @@ input::placeholder {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+/* Add this to your CombinedStyles.css */
 
-
-/* ===== DASHBOARD HOME (IMAGE-BASED LAYOUT) ===== */
-
-/* Hero banner */
-.home-hero {
-    width: 100%;
-    margin: 0 0 25px 0;
-}
-
-.home-hero img {
-    width: 100%;
-    height: 260px;
-    object-fit: cover;
-    border-radius: 6px;
-}
-
-/* Popular venues label */
-.popular-label {
-    display: inline-block;
-    background: #d9b7a3;
-    color: #000;
-    padding: 6px 14px;
+/* Back to Offers button styling */
+.venues-header .back-button {
+    padding: 8px 16px;
+    background-color: #f8f8f8;
+    color: #333;
+    border: 1px solid #ddd;
     border-radius: 4px;
-    font-weight: bold;
-    margin: 10px 0 20px 0;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+    margin: 0;
+    position: static;
+    width: auto;
+    height: auto;
+    display: inline-block;
 }
 
-/* Popular venue layout */
-.popular-venue {
+.venues-header .back-button:hover {
+    background-color: #e0e0e0;
+}
+
+/* Make sure the absolute back-button doesn't interfere */
+.back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: none;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
     display: flex;
-    gap: 30px;
-    align-items: flex-start;
-    background: transparent;
-}
-
-/* Image left */
-.popular-venue img {
-    width: 360px;
-    height: 220px;
-    object-fit: cover;
-    border-radius: 6px;
-}
-
-/* Text right */
-.popular-content {
-    flex: 1;
-    color: #333;
-    line-height: 1.7;
-    font-size: 15px;
-}
-
-/* Read more aligned right */
-.popular-content .read-more-btn {
-    margin-top: 15px;
-    float: right;
-}
-/* Add these to your LandingPage.css */
-
-.loading {
-    text-align: center;
-    padding: 40px;
-    font-size: 18px;
-    color: #666;
-}
-
-.error {
-    text-align: center;
-    padding: 40px;
-    color: #ff4444;
-    background-color: #ffe6e6;
-    border-radius: 8px;
-    margin: 20px 0;
-}
-
-.popular-venue h3 {
-    margin-top: 0;
-    color: #333;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #bd9780;
     font-size: 24px;
-    margin-bottom: 10px;
+    text-decoration: none;
+    font-weight: bolder;
+    padding: 0;
+    margin: 0;
+    line-height: 1;
 }
 
-.popular-content p {
-    margin-bottom: 10px;
-    line-height: 1.6;
-}
-
-.popular-content strong {
-    color: #333;
+.back-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(-3px);
 }

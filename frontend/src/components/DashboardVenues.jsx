@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './css/LandingPage.css';
 import axios from 'axios';
 
-const DashboardVenues = ({ selectedVenue, selectedVenueId, startBooking }) => {
+const DashboardVenues = ({ selectedVenue, selectedVenueId, startBooking, onBackToOffers }) => {
     const [venueData, setVenueData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -64,13 +64,25 @@ const DashboardVenues = ({ selectedVenue, selectedVenueId, startBooking }) => {
         return `http://localhost:5000/uploads/venues/${imagePath}`;
     };
 
+    const handleBackToOffers = () => {
+        if (onBackToOffers) {
+            onBackToOffers();
+        }
+    };
+
     // Show loading state
     if (loading) {
         return (
             <div className="tab-content active">
-                <h1 style={{ padding: '25px 40px 10px', margin: 0, fontFamily: "'Playfair Display', serif" }}>
-                    Loading Venue Details...
-                </h1>
+                <div className="venues-header">
+                    <h2>Loading Venue Details...</h2>
+                    <button 
+                        onClick={handleBackToOffers}
+                        className="back-button"
+                    >
+                        ← Back to Offers
+                    </button>
+                </div>
                 <div style={{ 
                     textAlign: 'center', 
                     padding: '40px',
@@ -89,9 +101,15 @@ const DashboardVenues = ({ selectedVenue, selectedVenueId, startBooking }) => {
     if (error) {
         return (
             <div className="tab-content active">
-                <h1 style={{ padding: '25px 40px 10px', margin: 0, fontFamily: "'Playfair Display', serif" }}>
-                    Venue Details
-                </h1>
+                <div className="venues-header">
+                    <h2>Venue Details</h2>
+                    <button 
+                        onClick={handleBackToOffers}
+                        className="back-button"
+                    >
+                        ← Back to Offers
+                    </button>
+                </div>
                 <div style={{ 
                     textAlign: 'center', 
                     padding: '40px',
@@ -121,9 +139,15 @@ const DashboardVenues = ({ selectedVenue, selectedVenueId, startBooking }) => {
     if (!venueData && !selectedVenueId) {
         return (
             <div className="tab-content active">
-                <h1 style={{ padding: '25px 40px 10px', margin: 0, fontFamily: "'Playfair Display', serif" }}>
-                    Venue Details
-                </h1>
+                <div className="venues-header">
+                    <h2>No Venue Selected</h2>
+                    <button 
+                        onClick={handleBackToOffers}
+                        className="back-button"
+                    >
+                        ← Back to Offers
+                    </button>
+                </div>
                 <div style={{ 
                     textAlign: 'center', 
                     padding: '40px',
@@ -140,22 +164,23 @@ const DashboardVenues = ({ selectedVenue, selectedVenueId, startBooking }) => {
     
     return (
         <div className="tab-content active">
-            <h1 style={{ padding: '25px 40px 10px', margin: 0, fontFamily: "'Playfair Display', serif" }}>
-                {venue.title}
-            </h1>
+            <div className="venues-header">
+                <h2>{venue.title}</h2>
+                <button 
+                    onClick={handleBackToOffers}
+                    className="back-button"
+                >
+                    ← Back to Offers
+                </button>
+            </div>
             
-            <div style={{ padding: '0 40px' }}>
+            <div className="venue-detail-container">
                 {/* Venue Image */}
                 <div style={{ marginBottom: '30px' }}>
                     <img
                         src={getFullImageUrl(venue.main_image || venue.image || (venue.images && venue.images[0]))}
                         alt={venue.title}
-                        style={{
-                            width: '100%',
-                            height: '400px',
-                            objectFit: 'cover',
-                            borderRadius: '8px'
-                        }}
+                        className="venue-detail-image"
                         onError={(e) => {
                             e.target.onerror = null;
                             e.target.src = 'https://via.placeholder.com/800x400?text=No+Image';
@@ -164,11 +189,7 @@ const DashboardVenues = ({ selectedVenue, selectedVenueId, startBooking }) => {
                 </div>
 
                 {/* Venue Details */}
-                <div style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: '2fr 1fr', 
-                    gap: '40px' 
-                }}>
+                <div className="venue-detail-grid">
                     {/* Left Column - Details */}
                     <div>
                         <h2 style={{ color: '#bd9780', marginBottom: '20px' }}>Venue Details</h2>
@@ -216,49 +237,22 @@ const DashboardVenues = ({ selectedVenue, selectedVenueId, startBooking }) => {
 
                     {/* Right Column - Booking Card */}
                     <div>
-                        <div style={{
-                            background: '#f8f8f8',
-                            padding: '25px',
-                            borderRadius: '8px',
-                            border: '1px solid #e0e0e0'
-                        }}>
-                            <h3 style={{ 
-                                color: '#bd9780', 
-                                marginBottom: '20px',
-                                textAlign: 'center'
-                            }}>
-                                Booking Summary
-                            </h3>
+                        <div className="booking-summary-card">
+                            <h3>Booking Summary</h3>
                             
                             <div style={{ marginBottom: '25px' }}>
-                                <div style={{ 
-                                    display: 'flex', 
-                                    justifyContent: 'space-between',
-                                    marginBottom: '10px'
-                                }}>
+                                <div className="booking-summary-row">
                                     <span>Venue:</span>
                                     <span style={{ fontWeight: 'bold' }}>{venue.title}</span>
                                 </div>
-                                <div style={{ 
-                                    display: 'flex', 
-                                    justifyContent: 'space-between',
-                                    marginBottom: '15px'
-                                }}>
+                                <div className="booking-summary-row">
                                     <span>Price:</span>
-                                    <span style={{ 
-                                        fontWeight: 'bold', 
-                                        color: '#bd9780',
-                                        fontSize: '18px'
-                                    }}>
-                                        ${parseFloat(venue.price).toFixed(2)}
+                                    <span className="booking-price">
+                                        ₹{parseFloat(venue.price).toFixed(2)}/hour
                                     </span>
                                 </div>
                                 {venue.capacity && (
-                                    <div style={{ 
-                                        display: 'flex', 
-                                        justifyContent: 'space-between',
-                                        marginBottom: '15px'
-                                    }}>
+                                    <div className="booking-summary-row">
                                         <span>Capacity:</span>
                                         <span>{venue.capacity} people</span>
                                     </div>

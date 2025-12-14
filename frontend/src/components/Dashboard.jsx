@@ -25,7 +25,7 @@ const Dashboard = ({ user, onLogout }) => {
     const [showQRModal, setShowQRModal] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
-    
+
     // Data arrays
     const [recentEvents] = useState([]);
     const [wallets] = useState([
@@ -53,9 +53,44 @@ const Dashboard = ({ user, onLogout }) => {
         }
     };
 
+    // Handle "Read More" click from DashboardHome
+    const handleReadMoreClick = (venueData) => {
+        console.log('📍 Read More clicked, venue data:', venueData);
+
+        // Set the basic venue info
+        setSelectedVenue({
+            id: venueData.id,
+            title: venueData.title || venueData.name,
+            address: venueData.address,
+            description: venueData.description,
+            price: venueData.price || venueData.price_per_hour,
+            capacity: venueData.capacity,
+            contact_email: venueData.contact_email,
+            contact_phone: venueData.contact_phone,
+            image: venueData.image,
+            location: venueData.location
+        });
+
+        // Also set the venue ID to fetch complete details
+        setSelectedVenueId(venueData.id);
+
+        // Switch to venues tab
+        setActiveTab('venues');
+
+        // Show a notification or highlight
+        setTimeout(() => {
+            if (document.querySelector('.selected-venue-highlight')) {
+                document.querySelector('.selected-venue-highlight').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        }, 100);
+    };
+
     const handleBookNow = (offer) => {
         console.log('Booking offer from Dashboard:', offer);
-        
+
         // Set the basic venue info from offers
         setSelectedVenue({
             id: offer.id,
@@ -68,26 +103,26 @@ const Dashboard = ({ user, onLogout }) => {
             contact_phone: offer.contact_phone,
             image: offer.image
         });
-        
+
         // Also set the venue ID to fetch complete details
         setSelectedVenueId(offer.id);
-        
+
         // Switch to venues tab
         setActiveTab('venues');
     };
 
     const startBooking = (venue) => {
         console.log('Starting booking for:', venue);
-        
+
         // Use the detailed venue data if available, otherwise use what we have
         const venueToBook = selectedVenueData || venue || selectedVenue;
-        
+
         if (!venueToBook) {
             console.error('No venue data available for booking');
             alert('Please select a venue first');
             return;
         }
-        
+
         setSelectedVenue(venueToBook);
         setActiveTab('booking');
     };
@@ -191,7 +226,7 @@ const Dashboard = ({ user, onLogout }) => {
                         <button className="profile-icon-btn" title="Profile Settings">
                             <FaUserCircle size={26} />
                         </button>
-                        <button 
+                        <button
                             className="btn-logout"
                             onClick={onLogout}
                         >
@@ -209,7 +244,7 @@ const Dashboard = ({ user, onLogout }) => {
                 borderBottom: '2px solid #333',
                 background: 'white'
             }}>
-                <button 
+                <button
                     onClick={() => {
                         setActiveTab('home');
                         setSelectedVenue(null);
@@ -229,7 +264,7 @@ const Dashboard = ({ user, onLogout }) => {
                 >
                     Home
                 </button>
-                <button 
+                <button
                     onClick={() => {
                         setActiveTab('offers');
                         setSelectedVenue(null);
@@ -249,7 +284,7 @@ const Dashboard = ({ user, onLogout }) => {
                 >
                     Offers
                 </button>
-                <button 
+                <button
                     onClick={() => {
                         setActiveTab('venues');
                     }}
@@ -271,24 +306,26 @@ const Dashboard = ({ user, onLogout }) => {
             {/* Main Content */}
             <div className="dashboard-content">
                 {activeTab === 'home' && (
-                    <DashboardHome 
+                    <DashboardHome
                         recentEvents={recentEvents}
+                        onReadMoreClick={handleReadMoreClick}
                     />
                 )}
                 {activeTab === 'offers' && (
-                    <DashboardOffers 
+                    <DashboardOffers
                         handleBookNow={handleBookNow}
                     />
                 )}
                 {activeTab === 'venues' && (
-                    <DashboardVenues 
+                    <DashboardVenues
                         selectedVenue={selectedVenueData || selectedVenue}
                         selectedVenueId={selectedVenueId}
                         startBooking={startBooking}
+                        onBackToOffers={() => setActiveTab('offers')}
                     />
                 )}
                 {activeTab === 'booking' && (
-                    <DashboardBooking 
+                    <DashboardBooking
                         selectedVenue={selectedVenueData || selectedVenue}
                         bookingData={bookingData}
                         setBookingData={setBookingData}
@@ -297,7 +334,7 @@ const Dashboard = ({ user, onLogout }) => {
                     />
                 )}
                 {activeTab === 'payment' && (
-                    <DashboardPayment 
+                    <DashboardPayment
                         selectedVenue={selectedVenueData || selectedVenue}
                         selectedWallet={selectedWallet}
                         setSelectedWallet={setSelectedWallet}
@@ -310,7 +347,7 @@ const Dashboard = ({ user, onLogout }) => {
 
             {/* Modals */}
             {showQRModal && selectedPaymentMethod && (
-                <QRCodeModal 
+                <QRCodeModal
                     selectedPaymentMethod={selectedPaymentMethod}
                     selectedVenue={selectedVenueData || selectedVenue}
                     closeQRModal={closeQRModal}
@@ -319,7 +356,7 @@ const Dashboard = ({ user, onLogout }) => {
             )}
 
             {showPaymentModal && (
-                <PaymentSuccessModal 
+                <PaymentSuccessModal
                     selectedVenue={selectedVenueData || selectedVenue}
                     closePaymentModal={closePaymentModal}
                 />
