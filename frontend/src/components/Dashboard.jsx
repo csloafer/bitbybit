@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; // Add useEffect
+import React, { useState, useEffect } from 'react';
 import './css/LandingPage.css';
 import DashboardHome from './DashboardHome.jsx';
 import DashboardOffers from './DashboardOffers.jsx';
@@ -8,13 +8,13 @@ import DashboardPayment from './DashboardPayment.jsx';
 import QRCodeModal from './QRCodeModal.jsx';
 import PaymentSuccessModal from './PaymentSuccessModal.jsx';
 import { FaUserCircle } from 'react-icons/fa';
-import axios from 'axios'; // Add axios
+import axios from 'axios';
 
 const Dashboard = ({ user, onLogout }) => {
     const [activeTab, setActiveTab] = useState('home');
     const [selectedVenue, setSelectedVenue] = useState(null);
-    const [selectedVenueId, setSelectedVenueId] = useState(null); // Add this
-    const [selectedVenueData, setSelectedVenueData] = useState(null); // Add this
+    const [selectedVenueId, setSelectedVenueId] = useState(null);
+    const [selectedVenueData, setSelectedVenueData] = useState(null);
     const [bookingData, setBookingData] = useState({
         fromDate: '',
         toDate: '',
@@ -25,6 +25,14 @@ const Dashboard = ({ user, onLogout }) => {
     const [showQRModal, setShowQRModal] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+    
+    // Data arrays
+    const [recentEvents] = useState([]);
+    const [wallets] = useState([
+        { id: 1, name: 'PayPal', type: 'paypal' },
+        { id: 2, name: 'Credit Card', type: 'credit-card' },
+        { id: 3, name: 'Bank Transfer', type: 'bank-transfer' }
+    ]);
 
     // Fetch venue details when selectedVenueId changes
     useEffect(() => {
@@ -74,11 +82,16 @@ const Dashboard = ({ user, onLogout }) => {
         // Use the detailed venue data if available, otherwise use what we have
         const venueToBook = selectedVenueData || venue || selectedVenue;
         
+        if (!venueToBook) {
+            console.error('No venue data available for booking');
+            alert('Please select a venue first');
+            return;
+        }
+        
         setSelectedVenue(venueToBook);
         setActiveTab('booking');
     };
 
-    // Rest of your existing functions remain the same...
     const cancelBooking = () => {
         if (window.confirm("Are you sure you want to cancel this booking?")) {
             setBookingData({
@@ -153,14 +166,26 @@ const Dashboard = ({ user, onLogout }) => {
         setActiveTab('venues');
     };
 
+    // Check if user exists
+    if (!user) {
+        console.error('User data is missing!');
+        return (
+            <div style={{ padding: '20px', textAlign: 'center' }}>
+                <h2>Loading error</h2>
+                <p>User data not available. Please try logging in again.</p>
+                <button onClick={onLogout}>Back to Login</button>
+            </div>
+        );
+    }
+
     return (
         <div className="dashboard">
-            {/* Header - Keep as is */}
+            {/* Header */}
             <header className="header">
                 <div className="container1">
                     <div className="logo">
                         <h1>VENUEASE</h1>
-                        <p>Welcome, <strong>{user.full_Name}</strong></p>
+                        <p>Welcome, <strong>{user.full_Name || user.name || 'User'}</strong></p>
                     </div>
                     <nav className="navigation">
                         <button className="profile-icon-btn" title="Profile Settings">
