@@ -1206,3 +1206,36 @@ input::placeholder {
     margin-top: 15px;
     float: right;
 }
+/* Add these to your LandingPage.css */
+
+.loading {
+    text-align: center;
+    padding: 40px;
+    font-size: 18px;
+    color: #666;
+}
+
+.error {
+    text-align: center;
+    padding: 40px;
+    color: #ff4444;
+    background-color: #ffe6e6;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.popular-venue h3 {
+    margin-top: 0;
+    color: #333;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.popular-content p {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.popular-content strong {
+    color: #333;
+}
