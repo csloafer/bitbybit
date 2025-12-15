@@ -9,6 +9,7 @@ import QRCodeModal from './QRCodeModal.jsx';
 import PaymentSuccessModal from './PaymentSuccessModal.jsx';
 import { FaUserCircle } from 'react-icons/fa';
 import axios from 'axios';
+import bannerImage from './css/venueeventbanner.jpg';
 
 const Dashboard = ({ user, onLogout }) => {
     const [activeTab, setActiveTab] = useState('home');

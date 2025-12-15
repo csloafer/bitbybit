@@ -87,25 +87,24 @@ const DashboardOffers = ({ handleBookNow }) => {
     };
 
     // Handle book now click
-    // In DashboardOffers.jsx, update the handleBookNowClick function:
-const handleBookNowClick = (offer) => {
-    console.log('Booking offer:', offer);
-    if (handleBookNow) {
-        // Pass the complete offer object
-        handleBookNow({
-            id: offer.id,
-            title: offer.title,
-            address: offer.address,
-            description: offer.description,
-            price: offer.price,
-            capacity: offer.capacity,
-            contact_email: offer.contact_email,
-            contact_phone: offer.contact_phone,
-            image: offer.image,
-            all_images: offer.all_images
-        });
-    }
-};
+    const handleBookNowClick = (offer) => {
+        console.log('Booking offer:', offer);
+        if (handleBookNow) {
+            // Pass the complete offer object
+            handleBookNow({
+                id: offer.id,
+                title: offer.title,
+                address: offer.address,
+                description: offer.description,
+                price: offer.price,
+                capacity: offer.capacity,
+                contact_email: offer.contact_email,
+                contact_phone: offer.contact_phone,
+                image: offer.image,
+                all_images: offer.all_images
+            });
+        }
+    };
 
     // Refresh offers
     const refreshOffers = () => {
@@ -122,19 +121,23 @@ const handleBookNowClick = (offer) => {
     if (loading) {
         return (
             <div className="tab-content active">
-                <h1 style={{ padding: '25px 40px 10px', margin: 0, fontFamily: "'Playfair Display', serif" }}>
-                    Offers
-                </h1>
-
-                <div className="search-box" style={{
-                    margin: '20px 40px',
-                    textAlign: 'right',
+                {/* HEADER WITH TITLE AND SEARCH IN ONE ROW */}
+                <div style={{
                     display: 'flex',
-                    justifyContent: 'flex-end',
-                    gap: '10px'
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '25px 40px 20px'
                 }}>
+                    <h1 style={{ 
+                        margin: 0, 
+                        fontFamily: "'Playfair Display', serif",
+                        fontSize: '28px'
+                    }}>
+                        Offers
+                    </h1>
+
                     <div style={{
-                        display: 'inline-flex',
+                        display: 'flex',
                         alignItems: 'center',
                         gap: '10px'
                     }}>
@@ -174,19 +177,23 @@ const handleBookNowClick = (offer) => {
     if (error) {
         return (
             <div className="tab-content active">
-                <h1 style={{ padding: '25px 40px 10px', margin: 0, fontFamily: "'Playfair Display', serif" }}>
-                    Offers
-                </h1>
-
-                <div className="search-box" style={{
-                    margin: '20px 40px',
-                    textAlign: 'right',
+                {/* HEADER WITH TITLE AND SEARCH IN ONE ROW */}
+                <div style={{
                     display: 'flex',
-                    justifyContent: 'flex-end',
-                    gap: '10px'
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '25px 40px 20px'
                 }}>
+                    <h1 style={{ 
+                        margin: 0, 
+                        fontFamily: "'Playfair Display', serif",
+                        fontSize: '28px'
+                    }}>
+                        Offers
+                    </h1>
+
                     <div style={{
-                        display: 'inline-flex',
+                        display: 'flex',
                         alignItems: 'center',
                         gap: '10px'
                     }}>
@@ -199,7 +206,8 @@ const handleBookNowClick = (offer) => {
                                 padding: '8px 12px',
                                 borderRadius: '20px',
                                 border: '1px solid #ccc',
-                                width: '250px'
+                                width: '250px',
+                                fontSize: '14px'
                             }}
                         />
                         <button
@@ -249,21 +257,27 @@ const handleBookNowClick = (offer) => {
 
     return (
         <div className="tab-content active">
-            <h1 style={{ padding: '25px 40px 10px', margin: 0, fontFamily: "'Playfair Display', serif" }}>
-                Offers ({offers.length} venues)
-            </h1>
-
-            <div className="search-box" style={{
-                margin: '20px 40px',
-                textAlign: 'right',
+            {/* HEADER WITH TITLE AND SEARCH IN ONE ROW */}
+            <div style={{
                 display: 'flex',
-                justifyContent: 'flex-end',
-                gap: '10px'
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '25px 40px 20px',
+                flexWrap: 'wrap' // For responsive design
             }}>
+                <h1 style={{ 
+                    margin: 0, 
+                    fontFamily: "'Playfair Display', serif",
+                    fontSize: '28px',
+                    color: '#333'
+                }}>
+                    Offers ({offers.length} venues)
+                </h1>
+
                 <div style={{
-                    display: 'inline-flex',
+                    display: 'flex',
                     alignItems: 'center',
-                    gap: '10px'
+                    gap: '15px'
                 }}>
                     <input
                         type="text"
@@ -271,20 +285,30 @@ const handleBookNowClick = (offer) => {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         style={{
-                            padding: '8px 12px',
-                            borderRadius: '20px',
+                            padding: '10px 15px',
+                            borderRadius: '25px',
                             border: '1px solid #ccc',
-                            width: '250px'
+                            width: '280px',
+                            fontSize: '14px',
+                            transition: 'all 0.3s ease'
+                        }}
+                        onFocus={(e) => {
+                            e.target.style.borderColor = '#bd9780';
+                            e.target.style.boxShadow = '0 0 0 2px rgba(189, 151, 128, 0.2)';
+                        }}
+                        onBlur={(e) => {
+                            e.target.style.borderColor = '#ccc';
+                            e.target.style.boxShadow = 'none';
                         }}
                     />
                     <button
                         onClick={refreshOffers}
                         style={{
-                            padding: '8px 20px',
+                            padding: '10px 20px',
                             backgroundColor: '#f5f5f5',
                             color: '#333',
                             border: '1px solid #ccc',
-                            borderRadius: '20px',
+                            borderRadius: '25px',
                             cursor: 'pointer',
                             fontSize: '14px',
                             display: 'flex',
@@ -352,8 +376,8 @@ const handleBookNowClick = (offer) => {
                                 border: '1px solid #ccc',
                                 boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
                                 cursor: 'pointer',
-                                height: '280px', // Fixed height
-                                overflow: 'hidden' // Prevent content overflow
+                                height: '280px',
+                                overflow: 'hidden'
                             }}
                         >
                             {/* IMAGE - Fixed size */}
@@ -380,13 +404,13 @@ const handleBookNowClick = (offer) => {
                                 />
                             </div>
 
-                            {/* CONTENT COLUMN - Fixed height with scroll if needed */}
+                            {/* CONTENT COLUMN */}
                             <div
                                 style={{
                                     flex: 1,
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    minHeight: 0, // Important for child overflow
+                                    minHeight: 0,
                                 }}
                             >
                                 <div
@@ -443,7 +467,7 @@ const handleBookNowClick = (offer) => {
                                     )}
                                 </div>
 
-                                {/* PRICE + BUTTON (ALWAYS BOTTOM-RIGHT) */}
+                                {/* PRICE + BUTTON */}
                                 <div
                                     style={{
                                         marginTop: 'auto',
@@ -476,7 +500,14 @@ const handleBookNowClick = (offer) => {
                                             border: 'none',
                                             borderRadius: '20px',
                                             cursor: 'pointer',
-                                            fontSize: '14px'
+                                            fontSize: '14px',
+                                            transition: 'all 0.2s ease'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.target.style.backgroundColor = '#a87f66';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.target.style.backgroundColor = '#bd9780';
                                         }}
                                     >
                                         BOOK NOW

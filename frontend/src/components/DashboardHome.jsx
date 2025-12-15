@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './css/LandingPage.css';
+import bannerImage from './css/venueeventbanner.jpg'; // Import the image
 
 const DashboardHome = ({ onReadMoreClick }) => {
     const [popularVenue, setPopularVenue] = useState(null);
@@ -65,11 +66,17 @@ const DashboardHome = ({ onReadMoreClick }) => {
 
     return (
         <div className="tab-content active">
-            {/* Hero / Banner */}
+            {/* Hero / Banner - UPDATED WITH YOUR IMAGE */}
             <div className="home-hero">
                 <img
-                    src="/images/banner.jpg"
-                    alt="Event Banner"
+                    src={bannerImage}
+                    alt="INDUSTRIENT OF SECURITY - November 2023 Event Banner"
+                    style={{
+                        width: '100%',
+                        maxHeight: '300px',
+                        objectFit: 'cover',
+                        borderRadius: '8px'
+                    }}
                 />
             </div>
 
